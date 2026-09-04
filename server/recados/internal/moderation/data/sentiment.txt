@@ -1,0 +1,115 @@
+# Fallback tone reader: term, then a signed score. Summed over the note.
+#
+# This runs only when the model could not be reached. It is a bag of words: it
+# cannot read irony, negation or context, and it is not supposed to. It exists
+# so a note still gets a label on the day the provider is down, instead of the
+# wall silently filling with "neutral".
+#
+# Terms are normalised on load like everything else. One term per line, score
+# last, separated by whitespace.
+
+# --- pt-BR, positive -------------------------------------------------------
+otimo	2
+ótimo	2
+excelente	2
+incrivel	2
+incrível	2
+maravilhoso	2
+sensacional	2
+fantastico	2
+fantástico	2
+lindo	2
+linda	2
+massa	1
+bacana	1
+legal	1
+bom	1
+boa	1
+top	1
+show	1
+parabens	2
+parabéns	2
+sucesso	1
+gostei	2
+adorei	2
+amei	2
+curti	1
+inspirador	2
+caprichado	2
+impressionante	2
+obrigado	1
+valeu	1
+abraco	1
+abraço	1
+saudade	1
+genial	2
+foda	1
+
+# --- pt-BR, negative -------------------------------------------------------
+ruim	-2
+pessimo	-2
+péssimo	-2
+horrivel	-2
+horrível	-2
+terrivel	-2
+terrível	-2
+feio	-2
+lixo	-2
+odeio	-3
+odiei	-3
+chato	-1
+chata	-1
+fraco	-1
+lento	-1
+confuso	-1
+decepcao	-2
+decepção	-2
+decepcionante	-2
+nojento	-3
+inutil	-2
+inútil	-2
+burro	-2
+idiota	-3
+besteira	-1
+perda de tempo	-3
+
+# --- English, positive -----------------------------------------------------
+great	2
+awesome	2
+amazing	2
+excellent	2
+beautiful	2
+brilliant	2
+love	2
+loved	2
+nice	1
+good	1
+cool	1
+clean	1
+smooth	1
+impressive	2
+inspiring	2
+congrats	2
+congratulations	2
+thanks	1
+well done	2
+best	1
+
+# --- English, negative -----------------------------------------------------
+bad	-2
+awful	-2
+terrible	-2
+horrible	-2
+ugly	-2
+trash	-2
+garbage	-2
+hate	-3
+hated	-3
+boring	-1
+slow	-1
+confusing	-1
+broken	-2
+useless	-2
+disappointing	-2
+waste of time	-3
+sucks	-2

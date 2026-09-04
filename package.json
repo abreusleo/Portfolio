@@ -1,17 +1,21 @@
 {
-    "name": "threejs-journey-exercise",
-    "private": true,
-    "type": "module",
-    "scripts": {
-        "dev": "vite",
-        "build": "vite build"
-    },
-    "devDependencies": {
-        "vite": "^6.2.2",
-        "vite-plugin-restart": "^0.4.2"
-    },
-    "dependencies": {
-        "lil-gui": "^0.21.0",
-        "three": "^0.174.0"
-    }
+  "name": "threejs-journey-exercise",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "predev": "node scripts/build-machine.mjs",
+    "dev": "vite",
+    "prebuild": "node scripts/build-machine.mjs",
+    "build": "vite build",
+    "postbuild": "node scripts/build-sw.mjs"
+  },
+  "devDependencies": {
+    "vite": "^6.2.2",
+    "vite-plugin-restart": "^0.4.2"
+  },
+  "dependencies": {
+    "gsap": "^3.15.0",
+    "lil-gui": "^0.21.0",
+    "three": "^0.174.0"
+  }
 }

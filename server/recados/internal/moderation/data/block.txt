@@ -1,0 +1,67 @@
+# Terms that never belong on the wall under any reading: slurs and abuse aimed
+# at what somebody is. A match here refuses the note outright and the model is
+# never asked, because there is nothing to weigh.
+#
+# Vulgarity does NOT go here — "que porra boa" is praise. Put that in
+# suspect.txt, which escalates instead of refusing.
+#
+# Terms are normalised on load exactly like the note is, so accents, leetspeak
+# and repeated letters are already handled. Write the plain word.
+#
+# This is a seed. The long tail lives in maintained lists, notably
+# github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words
+
+# --- pt-BR -----------------------------------------------------------------
+viado
+veado
+bicha
+bichinha
+sapatao
+traveco
+macaca preta
+crioulo
+neguinho de merda
+mongoloide
+mongolóide
+retardado
+retardada
+aleijado de merda
+puta que pariu voce
+filho da puta
+filha da puta
+arrombado
+arrombada
+otario de merda
+morre logo
+vai se matar
+te mato
+vou te matar
+estupro
+estuprador
+pedofilo
+pedófilo
+
+# --- English ---------------------------------------------------------------
+nigger
+nigga
+niggas
+faggot
+faggots
+fag
+tranny
+retard
+retarded
+kike
+spic
+chink
+wetback
+towelhead
+cunt
+whore
+kys
+kill yourself
+go die
+rapist
+pedophile
+paedophile
+child porn

@@ -1,18 +1,150 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio - Construction Room</title>
+    <title>Leonardo — basement</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Caveat:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-    <div id="instructions">
-        <p>Click to fly</p>
-        <p><strong>WASD</strong> to move &bull; <strong>Mouse</strong> to look &bull; <strong>Space / Shift</strong> up/down &bull; <strong>ESC</strong> to release</p>
-    </div>
     <canvas class="webgl"></canvas>
+
+    <!-- Loading gate -->
+    <div id="loader">
+        <div class="loader-inner">
+            <div class="loader-top">
+                <span class="wordmark">LEONARDO</span>
+                <span class="loader-tag" data-i18n="role">creative developer</span>
+            </div>
+
+            <div class="loader-count">
+                <span id="count">0</span><span class="pct">%</span>
+            </div>
+
+            <div class="loader-bar" id="bar" aria-hidden="true"></div>
+
+            <div class="loader-foot">
+                <p class="loader-log" id="log" data-i18n="loading">iniciando</p>
+                <div class="lang-toggle loader-lang">
+                    <button type="button" data-lang="pt">PT</button><span class="sep">/</span><button type="button" data-lang="en">EN</button>
+                </div>
+                <button id="enter" class="btn" data-i18n="enter" disabled>ENTRAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HUD -->
+    <div id="hud" class="hidden">
+        <div class="hud-tl">
+            <span class="wordmark">LEONARDO</span><span class="tag">/ basement</span>
+        </div>
+        <div class="hud-tr">
+            <div class="mode-toggle">
+                <span class="active">HUMAN</span><span class="sep">/</span><a href="./machine.html">MACHINE</a>
+            </div>
+            <div class="lang-toggle">
+                <button type="button" data-lang="pt">PT</button><span class="sep">/</span><button type="button" data-lang="en">EN</button>
+            </div>
+            <!-- Appears only once the first one has been found -->
+            <div id="eggs" class="eggs hidden" aria-live="polite">
+                <svg viewBox="0 0 24 30" width="15" height="19" aria-hidden="true">
+                    <path d="M12 1C7 1 2.5 9.5 2.5 17.5A9.5 9.5 0 0 0 21.5 17.5C21.5 9.5 17 1 12 1Z"
+                          fill="none" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M4 15.5h16M5.5 21h13" stroke="currentColor" stroke-width="1.4" opacity="0.6"/>
+                </svg>
+                <span id="eggs-count">0</span>
+            </div>
+        </div>
+        <div class="hud-bl">
+            <span id="hint" data-desktop>F explorar · ESC voltar</span>
+        </div>
+        <div class="hud-br">
+            <button id="explore" class="btn small" data-mobile>EXPLORAR</button>
+        </div>
+    </div>
+
+    <!-- Hover label for clickable objects -->
+    <div id="hotspot-label" class="hidden"></div>
+
+    <!-- Side panel, opened by clicking a product, a print or the board -->
+    <aside id="panel" class="hidden" aria-hidden="true">
+        <div class="panel-inner">
+            <div class="panel-top">
+                <p class="panel-eyebrow" id="panel-eyebrow"></p>
+                <div class="panel-nav hidden" id="panel-nav">
+                    <button id="panel-prev" class="panel-arrow" aria-label="Anterior">&lsaquo;</button>
+                    <span class="panel-count" id="panel-count"></span>
+                    <button id="panel-next" class="panel-arrow" aria-label="Próximo">&rsaquo;</button>
+                </div>
+            </div>
+            <h2 class="panel-title" id="panel-title"></h2>
+            <div class="panel-body" id="panel-body"></div>
+            <div class="panel-list hidden" id="panel-list"></div>
+            <dl class="panel-meta" id="panel-meta"></dl>
+            <div class="panel-actions">
+                <button id="panel-action" class="btn small accent hidden"></button>
+                <button id="panel-back" class="btn small ghost hidden" data-i18n="back">VOLTAR</button>
+                <button id="panel-close" class="btn small" data-i18n="close">FECHAR</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- The machine's screen, shown when the computer is clicked. Built by
+         Experience/Desktop.js from the same config the monitor is painted from. -->
+    <div id="desktop" class="hidden" aria-hidden="true">
+        <div class="dsk-frame">
+            <div class="dsk-stage" id="desktop-stage"></div>
+            <button id="desktop-exit" class="btn small" data-i18n="exit">SAIR</button>
+        </div>
+    </div>
+
+    <!-- Video player, opened by clicking the TV -->
+    <div id="player" class="hidden" aria-hidden="true">
+        <div class="player-box">
+            <div class="player-top">
+                <span class="player-brand" data-i18n="tvTitle">PORTFÓLIO</span>
+                <button id="player-close" class="btn small" data-i18n="close">FECHAR</button>
+            </div>
+            <div class="player-stage">
+                <video id="player-video" playsinline controls preload="metadata"></video>
+                <div id="player-fallback" class="player-fallback hidden">
+                    <p class="fb-title" data-i18n="videoMissing">Vídeo ainda não adicionado</p>
+                    <p class="fb-note"><span data-i18n="videoPath">Coloque o arquivo em</span> <code id="player-path">static/video/intro.mp4</code></p>
+                </div>
+            </div>
+            <p class="player-now">
+                <span class="player-title" id="player-title"></span>
+                <span class="player-note" id="player-note"></span>
+            </p>
+            <ol class="player-list" id="player-list"></ol>
+        </div>
+    </div>
+
+    <!-- Composer, opened from the door or from the wall's panel -->
+    <div id="compose" class="hidden" aria-hidden="true">
+        <div class="compose-card">
+            <p class="compose-title" data-i18n="composeTitle">Deixe um recado</p>
+            <p class="compose-hint" id="compose-hint" data-i18n="composeHint">Fica na porta, para quem vier depois.</p>
+            <textarea id="compose-text" maxlength="140" rows="3" spellcheck="false"></textarea>
+            <input id="compose-name" type="text" maxlength="24" spellcheck="false" autocomplete="off">
+            <p class="compose-status" id="compose-status"></p>
+            <div class="compose-foot">
+                <span class="compose-count" id="compose-count">0 / 140</span>
+                <button id="compose-cancel" class="btn small ghost" data-i18n="close">FECHAR</button>
+                <button id="compose-send" class="btn small" data-i18n="composeSend">COLAR NA PAREDE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shown while the visitor is choosing where the note goes -->
+    <p id="place-hint" class="hidden" data-i18n="placeHint">Arraste o post-it para onde quiser colar</p>
+
+    <!-- Mobile joystick -->
     <div id="joystick-zone"><div id="joystick-knob"></div></div>
+
     <script type="module" src="./script.js"></script>
 </body>
 </html>

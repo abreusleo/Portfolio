@@ -1,0 +1,72 @@
+# Vulgar, insulting or borderline depending entirely on who it is aimed at.
+#
+# A match here never refuses anything. It tells the model to read this note
+# strictly, which is the whole point: "que porra boa ficou isso" and "que porra
+# é essa, que lixo" share a word and mean opposite things, and only something
+# that reads the sentence can tell them apart.
+
+# --- pt-BR -----------------------------------------------------------------
+porra
+caralho
+merda
+bosta
+cacete
+puta
+putaria
+foder
+fodido
+fudido
+buceta
+pinto
+piroca
+cu
+babaca
+idiota
+imbecil
+burro
+burra
+estupido
+estúpido
+lixo
+horrivel
+horrível
+pessimo
+péssimo
+nojento
+vagabundo
+vagabunda
+piranha
+corno
+desgraca
+desgraça
+maldito
+odeio
+odio
+ódio
+favelado
+macaco
+preto
+gordo
+feio
+
+# --- English ---------------------------------------------------------------
+fuck
+fucking
+fucked
+shit
+bullshit
+bitch
+asshole
+dumbass
+idiot
+stupid
+moron
+trash
+garbage
+awful
+terrible
+disgusting
+hate
+sucks
+ugly
+fat

@@ -1,0 +1,32 @@
+# Leonardo Santos Abreu
+
+> Software Engineer Backend at Pismo, a Visa company. Backend software engineer working on core banking and card processing at Pismo.
+
+## Pages
+
+- [Human view](/): an interactive 3D room, in Portuguese or English
+- [Machine view](/machine.html): plain-text mirror of everything below
+
+## Now
+
+Software Engineer Backend at Pismo, since Sep 2024.
+Based in Rio de Janeiro, Brazil.
+
+## Applications
+
+- **Hub** — Sign-in and the way between the tools
+- **Orb** — One place for the feeds, videos and newsletters
+- **Fin** — Spending, read from the real bank data
+- **Cal** — Calorie tracking that reads a photo
+- **Fut** — Football tactics board, online
+- **Lvl** — Runs the game servers
+
+## Products
+
+- **Bios Health** — multi-tenant SaaS for running a hospital operating theatre in real time
+- **Surviving** — first-person post-apocalyptic survival game, built in s&box on Source 2
+
+## Links
+
+- [github](https://github.com/abreusleo)
+- [linkedin](https://www.linkedin.com/in/abreusleo/)

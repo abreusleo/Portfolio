@@ -1,80 +1,1474 @@
+:root
+{
+    --bg: #0b0c0e;
+    --fg: #e9e7e3;
+    --dim: #7c8189;
+    --accent: #ff8a3d;
+    --font: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
 *
 {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 html,
 body
 {
     overflow: hidden;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font);
+    -webkit-font-smoothing: antialiased;
 }
 
 .webgl
 {
     position: fixed;
-    top: 0;
-    left: 0;
+    inset: 0;
+    display: block;
     outline: none;
 }
 
-#instructions
+/*
+ * Hidden means gone, not merely transparent. An element at opacity 0 still has
+ * to be composited, and three of these are full-screen sheets with a backdrop
+ * blur: left in the tree at opacity 0 they cost the compositor a blur of the
+ * whole scene per frame each, for nothing anyone could see. visibility takes
+ * them out of that work entirely. The ones that fade get their visibility
+ * switched only once the fade has finished; see the per-element transitions.
+ */
+.hidden
+{
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* Loader                                                              */
+/* ------------------------------------------------------------------ */
+#loader
+{
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: flex;
+    align-items: flex-end;
+    background: var(--bg);
+    transition: opacity 0.8s ease, visibility 0s linear 0.8s;
+}
+
+#loader:not(.hidden)
+{
+    transition-delay: 0s;
+}
+
+#loader::after
+{
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.022) 0 1px, transparent 1px 3px);
+}
+
+.loader-inner
+{
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    padding: clamp(1.5rem, 5vw, 3.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.8rem, 2vw, 1.4rem);
+}
+
+.loader-top
+{
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.loader-tag
+{
+    color: var(--dim);
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+}
+
+.loader-count
+{
+    display: flex;
+    align-items: baseline;
+    line-height: 0.82;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    font-size: clamp(5rem, 22vw, 15rem);
+    font-variant-numeric: tabular-nums;
+}
+
+.loader-count .pct
+{
+    font-size: 0.24em;
+    letter-spacing: 0;
+    color: var(--accent);
+    margin-left: 0.35em;
+    align-self: flex-start;
+    padding-top: 0.4em;
+}
+
+.loader-bar
+{
+    font-size: clamp(0.5rem, 1.4vw, 0.85rem);
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    white-space: nowrap;
+    overflow: hidden;
+    line-height: 1;
+}
+
+.loader-foot
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    padding-top: clamp(0.8rem, 2vw, 1.3rem);
+}
+
+.loader-log
+{
+    color: var(--dim);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+}
+
+.loader-log::before
+{
+    content: '// ';
+    color: var(--accent);
+}
+
+/* ------------------------------------------------------------------ */
+/* Buttons                                                             */
+/* ------------------------------------------------------------------ */
+.btn
+{
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    padding: 0.85rem 2.6rem;
+    color: var(--bg);
+    background: var(--fg);
+    border: 0;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.3s, transform 0.1s, visibility 0s linear 0.3s;
+}
+
+.btn:not(.hidden)
+{
+    transition-delay: 0s;
+}
+
+.btn:hover:not(:disabled)
+{
+    background: var(--accent);
+}
+
+.btn:active:not(:disabled)
+{
+    transform: translateY(1px);
+}
+
+.btn:disabled
+{
+    opacity: 0.28;
+    cursor: default;
+}
+
+.btn:focus-visible
+{
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
+.btn.small
+{
+    padding: 0.55rem 1.1rem;
+    font-size: 0.68rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* HUD                                                                 */
+/* ------------------------------------------------------------------ */
+#hud
+{
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    pointer-events: none;
+    transition: opacity 0.6s ease, visibility 0s linear 0.6s;
+}
+
+#hud:not(.hidden)
+{
+    transition-delay: 0s;
+}
+
+#hud > div
+{
+    position: absolute;
+    padding: 1.2rem 1.4rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+}
+
+#hud a,
+#hud button
+{
+    pointer-events: auto;
+}
+
+.hud-tl { top: 0; left: 0; }
+.hud-tr { top: 0; right: 0; }
+.hud-bl { bottom: 0; left: 0; }
+.hud-br { bottom: 0; right: 0; }
+
+.wordmark
+{
+    font-weight: 800;
+    letter-spacing: 0.06em;
+}
+
+.tag
+{
+    color: var(--dim);
+    margin-left: 0.6rem;
+}
+
+.mode-toggle span.active
+{
+    color: var(--accent);
+}
+
+.mode-toggle .sep
+{
+    color: var(--dim);
+    margin: 0 0.5rem;
+}
+
+.mode-toggle a
+{
+    color: var(--dim);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.mode-toggle a:hover
+{
+    color: var(--fg);
+}
+
+#hint
+{
+    color: var(--dim);
+}
+
+/* Desktop / mobile only elements */
+body.mobile [data-desktop] { display: none; }
+body:not(.mobile) [data-mobile] { display: none; }
+
+/* ------------------------------------------------------------------ */
+/* The tally of hidden things, top right under the toggles             */
+/* ------------------------------------------------------------------ */
+.eggs
+{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.4rem;
+    margin-top: 0.7rem;
+    color: var(--accent);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    font-variant-numeric: tabular-nums;
+    transition: opacity 0.4s ease, visibility 0s linear 0.4s;
+}
+
+.eggs:not(.hidden)
+{
+    transition-delay: 0s;
+}
+
+/* The egg that flies from the click up to the counter */
+.egg-fly
+{
+    position: fixed;
+    z-index: 40;
+    pointer-events: none;
+    color: var(--accent);
+    transform: translate(-50%, -50%) scale(1.6);
+    transition: transform 0.6s cubic-bezier(0.32, 0.9, 0.3, 1), opacity 0.6s ease-in;
+}
+
+/* And the ring it leaves behind at the spot */
+.egg-ring
+{
+    position: fixed;
+    z-index: 39;
+    width: 14px;
+    height: 14px;
+    margin: -7px 0 0 -7px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    pointer-events: none;
+    animation: egg-ring 0.6s ease-out forwards;
+}
+
+@keyframes egg-ring
+{
+    0%   { transform: scale(0.4); opacity: 0.9; }
+    100% { transform: scale(5); opacity: 0; }
+}
+
+/* One pop when the count goes up, and nothing the rest of the time */
+.eggs.found
+{
+    animation: egg-pop 0.55s ease-out;
+}
+
+@keyframes egg-pop
+{
+    0%   { transform: scale(1); }
+    35%  { transform: scale(1.28); }
+    100% { transform: scale(1); }
+}
+
+/* ------------------------------------------------------------------ */
+/* Hover label                                                         */
+/* ------------------------------------------------------------------ */
+#hotspot-label
 {
     position: fixed;
     top: 0;
     left: 0;
+    z-index: 26;
+    pointer-events: none;
+    padding: 0.4rem 0.7rem;
+    background: rgba(10, 11, 13, 0.86);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: var(--fg);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: opacity 0.18s ease, visibility 0s linear 0.18s;
+}
+
+#hotspot-label:not(.hidden)
+{
+    transition-delay: 0s;
+}
+
+/* ------------------------------------------------------------------ */
+/* Info panel                                                          */
+/* ------------------------------------------------------------------ */
+#panel
+{
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 27;
+    width: min(560px, 100%);
+    display: flex;
+    align-items: center;
+    padding: clamp(1rem, 2.5vw, 2rem);
+    background: linear-gradient(to right, rgba(8, 9, 11, 0), rgba(8, 9, 11, 0.5) 30%);
+    transition: opacity 0.45s ease, visibility 0s linear 0.45s;
+}
+
+#panel:not(.hidden)
+{
+    transition-delay: 0s;
+}
+
+@media (max-width: 720px)
+{
+    #panel
+    {
+        width: 100%;
+        align-items: flex-end;
+        background: linear-gradient(to bottom, rgba(8, 9, 11, 0), rgba(8, 9, 11, 0.9) 35%);
+    }
+}
+
+/* A solid card, so the text never has to compete with the scene behind it */
+.panel-inner
+{
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    align-items: flex-start;
+    padding: clamp(1.2rem, 2.4vw, 1.8rem);
+    background: rgba(10, 11, 14, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    max-height: calc(100vh - 3rem);
+    overflow-y: auto;
+}
+
+.panel-eyebrow
+{
+    color: var(--accent);
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+.panel-title
+{
+    font-size: clamp(1.6rem, 4vw, 2.3rem);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+}
+
+.panel-body
+{
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.panel-body p
+{
+    color: #b6bcc6;
+    font-size: 0.8rem;
+    line-height: 1.8;
+    max-width: 46ch;
+}
+
+.panel-meta
+{
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.3rem 1.2rem;
+    margin: 0.2rem 0 0.4rem;
+    font-size: 0.7rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    padding-top: 0.9rem;
+    width: 100%;
+}
+
+.panel-meta dt
+{
+    color: var(--dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.panel-meta dd
+{
+    margin: 0;
+    letter-spacing: 0.04em;
+}
+
+.loader-lang
+{
+    margin: 0 1rem 0 0;
+}
+
+.lang-toggle
+{
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    justify-content: flex-end;
+    margin-top: 0.35rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+}
+
+.lang-toggle button
+{
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    letter-spacing: inherit;
+    color: var(--dim);
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.lang-toggle button:hover
+{
+    color: var(--fg);
+}
+
+.lang-toggle button.active
+{
+    color: var(--accent);
+}
+
+.lang-toggle button:focus-visible
+{
+    outline: 1px solid var(--accent);
+    outline-offset: 3px;
+}
+
+.panel-meta dd a
+{
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.panel-meta dd a:hover,
+.panel-meta dd a:focus-visible
+{
+    border-bottom-color: var(--accent);
+}
+
+.panel-meta:empty
+{
+    display: none;
+}
+
+/* Group index inside the panel */
+.panel-list
+{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.panel-list.hidden
+{
+    display: none;
+}
+
+.panel-pick
+{
+    display: grid;
+    grid-template-columns: 1.9rem 1fr;
+    gap: 0.15rem 0.8rem;
+    align-items: baseline;
+    text-align: left;
+    width: 100%;
+    font-family: inherit;
+    padding: 0.7rem 0.2rem;
+    background: transparent;
+    color: var(--fg);
+    border: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    transition: color 0.15s, padding-left 0.15s;
+}
+
+.panel-pick:hover
+{
+    padding-left: 0.5rem;
+}
+
+.panel-pick:hover .pick-title
+{
+    color: var(--accent);
+}
+
+.panel-pick:focus-visible
+{
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+}
+
+.pick-index
+{
+    font-size: 0.66rem;
+    color: var(--dim);
+    font-variant-numeric: tabular-nums;
+}
+
+.pick-title
+{
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    transition: color 0.15s;
+}
+
+.pick-note
+{
+    grid-column: 2;
+    font-size: 0.66rem;
+    color: var(--dim);
+    letter-spacing: 0.04em;
+}
+
+.panel-actions
+{
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 0.2rem;
+}
+
+.btn.ghost
+{
+    background: transparent;
+    color: var(--fg);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.btn.ghost:hover:not(:disabled)
+{
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.btn.hidden
+{
+    display: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Video player                                                        */
+/* ------------------------------------------------------------------ */
+#player
+{
+    position: fixed;
+    inset: 0;
+    z-index: 28;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1rem, 4vw, 3rem);
+    background: rgba(6, 7, 9, 0.82);
+    backdrop-filter: blur(8px);
+    transition: opacity 0.4s ease, visibility 0s linear 0.4s;
+}
+
+#player:not(.hidden)
+{
+    transition-delay: 0s;
+}
+
+.player-box
+{
+    width: min(1100px, 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.player-top
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.player-title
+{
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+}
+
+.player-brand
+{
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    color: var(--fg);
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 0.3rem;
+}
+
+.player-stage
+{
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: #000000;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    overflow: hidden;
+}
+
+.player-stage video
+{
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    background: #000000;
+}
+
+/* Shown in place of a file that is not there yet, so the gap is legible */
+.player-fallback
+{
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    text-align: center;
+    padding: 1.5rem;
+    background: repeating-linear-gradient(135deg, #0d0f12 0, #0d0f12 12px, #101216 12px, #101216 24px);
+}
+
+.player-fallback.hidden
+{
+    display: none;
+}
+
+.fb-title
+{
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.fb-note
+{
+    color: var(--dim);
+    font-size: 0.76rem;
+    letter-spacing: 0.06em;
+}
+
+.fb-note code
+{
+    color: var(--accent);
+}
+
+/* The caption the television shows beside its mark, moved under the video */
+.player-now
+{
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    margin: 0;
+    min-height: 1.2rem;
+}
+
+.player-title
+{
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.player-note
+{
+    font-size: 0.72rem;
+    color: var(--dim);
+    letter-spacing: 0.04em;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/*
+ * The rail. Same cards, same order, same highlight as the screen painted on
+ * the set in the room: that pairing is the whole point of the redesign, so
+ * these numbers answer to World/Textures.js makeTvMenu.
+ */
+.player-list
+{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 0.5rem;
+    overflow-x: auto;
+}
+
+@media (max-width: 640px)
+{
+    .player-list
+    {
+        grid-auto-columns: minmax(5.2rem, 1fr);
+    }
+}
+
+.pl-item
+{
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    background: rgba(0, 0, 0, 0.6);
-    color: #ffffff;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-size: 18px;
-    text-align: center;
+    justify-content: center;
+    gap: 0.45rem;
+    font-family: inherit;
+    padding: 0.8rem 0.4rem;
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--dim);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     cursor: pointer;
-    z-index: 10;
-    transition: opacity 0.4s;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
-#instructions p
+.pl-item:hover
 {
-    margin: 4px 0;
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--fg);
 }
 
-#instructions.hidden
+.pl-item.active
 {
-    opacity: 0;
-    pointer-events: none;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--accent);
+    color: var(--fg);
 }
 
-/* Virtual Joystick */
-#joystick-zone
+.pl-item:focus-visible
+{
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+}
+
+.pl-mark
+{
+    display: flex;
+    opacity: 0.45;
+    transition: opacity 0.15s;
+}
+
+.pl-item.active .pl-mark,
+.pl-item:hover .pl-mark
+{
+    opacity: 1;
+}
+
+.pl-title
+{
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.pl-item.missing .pl-title
+{
+    text-decoration: line-through;
+    opacity: 0.55;
+}
+
+/* ------------------------------------------------------------------ */
+/* The machine's screen                                                */
+/* ------------------------------------------------------------------ */
+#desktop
 {
     position: fixed;
-    bottom: 30px;
-    left: 30px;
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    z-index: 20;
-    display: none;
-    touch-action: none;
+    inset: 0;
+    z-index: 29;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: clamp(1rem, 4vw, 3rem);
+    background: rgba(5, 6, 8, 0.9);
+    backdrop-filter: blur(10px);
+    transition: opacity 0.45s ease, visibility 0s linear 0.45s;
 }
 
-#joystick-knob
+#desktop:not(.hidden)
+{
+    transition-delay: 0s;
+}
+
+.dsk-frame
+{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.9rem;
+    /* The last term keeps the whole 2.4:1 screen on a short window by capping
+       the width instead of letting the height run off the bottom. */
+    width: min(1400px, 100%, calc((100vh - 9rem) * 2.4));
+}
+
+/*
+ * The shape of the real monitor: 1.32 m across the curve by 0.54 m tall, which
+ * is 2.4 to 1, the same as the 1920 by 800 canvas painted onto it. The stage
+ * used to take its height from that canvas, which it no longer contains, so
+ * the proportion is stated here instead.
+ */
+.dsk-stage
+{
+    width: 100%;
+    aspect-ratio: 12 / 5;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.9);
+    background: #0a1024;
+}
+
+/* ------------------------------------------------------------------ */
+/* The working desktop, built by Experience/Desktop.js                  */
+/* ------------------------------------------------------------------ */
+
+/* The same wallpaper the monitor is painted with, in CSS */
+.dsk
+{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background:
+        radial-gradient(120% 90% at 74% 18%, rgba(90, 120, 220, 0.34), rgba(70, 60, 160, 0.14) 50%, rgba(0, 0, 0, 0) 100%),
+        linear-gradient(150deg, #0a1024 0%, #141a3c 45%, #0b1526 100%);
+    font-size: clamp(0.62rem, 1.1vw, 0.82rem);
+}
+
+.dsk-icons
 {
     position: absolute;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 1.4%;
+    left: 1.6%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    z-index: 1;
+}
+
+.dsk-icon
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    width: 5.4rem;
+    padding: 0.5rem 0.2rem;
+    background: transparent;
+    border: 0;
+    border-radius: 8px;
+    color: #eef1f7;
+    font-family: inherit;
+    font-size: 0.85em;
+    cursor: pointer;
+}
+
+.dsk-icon:hover,
+.dsk-icon:focus-visible
+{
+    background: rgba(255, 255, 255, 0.1);
+    outline: none;
+}
+
+.dsk-mark
+{
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 14px;
+    background: rgba(12, 16, 26, 0.66);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--app);
+}
+
+.dsk-name
+{
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+/* ---- windows ---- */
+.dsk-windows
+{
+    position: absolute;
+    inset: 0 0 2.6rem 0;
+    z-index: 2;
     pointer-events: none;
+}
+
+.dsk-win
+{
+    position: absolute;
+    width: min(30rem, 62%);
+    max-height: 84%;
+    display: flex;
+    flex-direction: column;
+    background: rgba(14, 17, 24, 0.97);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    pointer-events: auto;
+}
+
+.dsk-win.dragging
+{
+    user-select: none;
+}
+
+.dsk-win-bar
+{
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.6rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: grab;
+}
+
+.dsk-win.dragging .dsk-win-bar
+{
+    cursor: grabbing;
+}
+
+.dsk-win-mark { display: flex; color: var(--app); }
+
+.dsk-win-title
+{
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.85em;
+    letter-spacing: 0.08em;
+    color: var(--fg);
+}
+
+.dsk-win-close
+{
+    width: 1.5rem;
+    height: 1.5rem;
+    display: grid;
+    place-items: center;
+    background: transparent;
+    border: 0;
+    border-radius: 4px;
+    color: var(--dim);
+    font-size: 1.1em;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.dsk-win-close:hover { background: #e5484d; color: #ffffff; }
+
+.dsk-win-body
+{
+    padding: 0.8rem;
+    overflow-y: auto;
+}
+
+/*
+ * A real logo, where an app has one. Its size comes from the same argument the
+ * drawn marks are given, written onto the element, so a logo and an emblem
+ * always come out the same size in the same place. Nothing here may set a
+ * percentage: see the note on icon() in Experience/Desktop.js.
+ */
+.dsk-logo
+{
+    display: block;
+    object-fit: contain;
+}
+
+/* ---- the note the desktop opens with ---- */
+.dsk-note
+{
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0.2rem 0.2rem 0.4rem;
+}
+
+.dsk-note p
+{
+    margin: 0;
+    font-size: 0.92em;
+    line-height: 1.55;
+    color: var(--fg);
+}
+
+/* ---- covers ---- */
+.dsk-grid
+{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(6.2rem, 1fr));
+    gap: 0.6rem;
+}
+
+.dsk-cover
+{
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.dsk-cover img
+{
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    border-radius: 4px;
+    display: block;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* No art yet: a card with the title, never a hole in the grid */
+.dsk-cover.missing img { display: none; }
+
+.dsk-cover.missing::before
+{
+    content: '';
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    border-radius: 4px;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.dsk-cover figcaption
+{
+    font-size: 0.82em;
+    color: var(--fg);
+    line-height: 1.25;
+}
+
+.dsk-cover-meta
+{
+    font-size: 0.74em;
+    color: var(--dim);
+    letter-spacing: 0.04em;
+}
+
+/* ---- the playlist ---- */
+.dsk-songs
+{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.dsk-songs li
+{
+    display: grid;
+    grid-template-columns: 1.6rem 1fr auto;
+    gap: 0.7rem;
+    align-items: baseline;
+    padding: 0.5rem 0.3rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.dsk-song-n { color: var(--app); font-size: 0.8em; font-variant-numeric: tabular-nums; }
+.dsk-song-title { font-size: 0.9em; color: var(--fg); }
+.dsk-song-artist { font-size: 0.8em; color: var(--dim); }
+
+.dsk-empty
+{
+    margin: 0;
+    padding: 1.4rem 0.4rem;
+    text-align: center;
+    color: var(--dim);
+    font-size: 0.85em;
+}
+
+/* ---- the bar along the bottom ---- */
+.dsk-bar
+{
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 3;
+    height: 2.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0 0.9rem;
+    background: rgba(10, 13, 20, 0.9);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.dsk-start { display: flex; color: #e6eaf2; opacity: 0.85; }
+
+.dsk-open { flex: 1; display: flex; gap: 0.4rem; min-width: 0; }
+
+.dsk-task
+{
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.6rem;
+    background: rgba(255, 255, 255, 0.07);
+    border: 0;
+    border-bottom: 2px solid var(--app);
+    border-radius: 3px;
+    color: var(--fg);
+    font-family: inherit;
+    font-size: 0.78em;
+    cursor: pointer;
+}
+
+.dsk-task:hover { background: rgba(255, 255, 255, 0.13); }
+.dsk-task svg { color: var(--app); }
+
+.dsk-clock
+{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.15;
+    color: #e6eaf2;
+    font-variant-numeric: tabular-nums;
+}
+
+.dsk-time { font-size: 0.9em; }
+.dsk-date { font-size: 0.72em; color: rgba(230, 234, 242, 0.62); }
+
+/* A floating window on a phone is a window you cannot read: fill the screen */
+@media (max-width: 720px)
+{
+    .dsk-win
+    {
+        inset: 0 0 2.6rem 0 !important;
+        width: auto;
+        max-height: none;
+        border-radius: 0;
+    }
+
+    .dsk-win-bar { cursor: default; }
+}
+
+/* Arrows that step between the pieces of a group */
+.panel-top
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+}
+
+.panel-nav
+{
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.panel-nav.hidden
+{
+    display: none;
+}
+
+.panel-arrow
+{
+    width: 1.9rem;
+    height: 1.9rem;
+    display: grid;
+    place-items: center;
+    font-family: inherit;
+    font-size: 1.1rem;
+    line-height: 1;
+    color: var(--fg);
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.panel-arrow:hover
+{
+    background: rgba(255, 255, 255, 0.12);
+    border-color: var(--accent);
+}
+
+.panel-arrow:focus-visible
+{
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.panel-count
+{
+    font-size: 0.68rem;
+    color: var(--dim);
+    letter-spacing: 0.12em;
+    font-variant-numeric: tabular-nums;
+    min-width: 3.4rem;
+    text-align: center;
+}
+
+/* ------------------------------------------------------------------ */
+/* Placing a note: the line shown while the post-it is being dragged.  */
+/* ------------------------------------------------------------------ */
+#place-hint
+{
+    position: fixed;
+    left: 50%;
+    bottom: 12%;
+    transform: translateX(-50%);
+    z-index: 26;
+    margin: 0;
+    padding: 0.55rem 1.1rem;
+    background: rgba(10, 11, 13, 0.86);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: var(--fg);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    pointer-events: none;
+    transition: opacity 0.25s ease, visibility 0s linear 0.25s;
+}
+
+#place-hint:not(.hidden)
+{
+    transition-delay: 0s;
+}
+
+/* ------------------------------------------------------------------ */
+/* Composer: a post-it, at the size a post-it is actually written at.  */
+/* ------------------------------------------------------------------ */
+
+#compose
+{
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1rem, 4vw, 3rem);
+    background: rgba(6, 7, 9, 0.82);
+    backdrop-filter: blur(8px);
+}
+
+.compose-card
+{
+    width: min(430px, 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 1.4rem 1.4rem 1.2rem;
+    background: #f2e6a8;
+    color: #23262c;
+    border-radius: 2px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+    transform: rotate(-0.7deg);
+}
+
+.compose-title
+{
+    margin: 0;
+    font-family: 'Caveat', 'Segoe Script', cursive;
+    font-size: 1.75rem;
+    line-height: 1;
+}
+
+.compose-hint
+{
+    margin: 0;
+    font-size: 0.7rem;
+    line-height: 1.45;
+    letter-spacing: 0.02em;
+    color: rgba(35, 38, 44, 0.62);
+}
+
+#compose-text
+{
+    width: 100%;
+    resize: none;
+    border: 0;
+    border-bottom: 1px solid rgba(35, 38, 44, 0.22);
+    background: transparent;
+    color: #23262c;
+    font-family: 'Caveat', 'Segoe Script', cursive;
+    font-size: 1.45rem;
+    line-height: 1.35;
+    padding: 0.4rem 0 0.5rem;
+}
+
+#compose-text::placeholder { color: rgba(35, 38, 44, 0.32); }
+#compose-text:focus { outline: none; border-bottom-color: rgba(35, 38, 44, 0.5); }
+
+/* The signature line, smaller than the message because it is not the point */
+#compose-name
+{
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid rgba(35, 38, 44, 0.16);
+    background: transparent;
+    color: #23262c;
+    font-family: 'Caveat', 'Segoe Script', cursive;
+    font-size: 1.1rem;
+    padding: 0.25rem 0 0.35rem;
+}
+
+#compose-name::placeholder { color: rgba(35, 38, 44, 0.3); }
+#compose-name:focus { outline: none; border-bottom-color: rgba(35, 38, 44, 0.42); }
+
+.compose-status
+{
+    margin: 0;
+    min-height: 1.1rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.03em;
+    color: #9a3412;
+}
+
+.compose-status.ok { color: #15803d; }
+
+.compose-foot
+{
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.compose-count
+{
+    margin-right: auto;
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
+    font-variant-numeric: tabular-nums;
+    color: rgba(35, 38, 44, 0.5);
+}
+
+.compose-count.over { color: #9a3412; }
+
+.compose-foot .btn
+{
+    background: rgba(35, 38, 44, 0.9);
+    color: #f2e6a8;
+    border-color: rgba(35, 38, 44, 0.9);
+}
+
+.compose-foot .btn.ghost
+{
+    background: transparent;
+    color: rgba(35, 38, 44, 0.7);
+    border-color: rgba(35, 38, 44, 0.28);
+}
+
+.compose-foot .btn:disabled { opacity: 0.45; cursor: default; }
+
+.btn.accent
+{
+    border-color: var(--accent);
+    color: var(--accent);
 }
