@@ -11,12 +11,15 @@ import { quality } from '../Utils/flags.js'
  * and all apply here for free. A panel that pulls the camera in close already
  * damps the drift to a fifth, so reading does not shake.
  *
- * Turning for the sweep, leaning for the pitch. Reaching the door behind you
- * and the TV beside you is most of a half turn, and no amount of leaning can
- * mean that without becoming unusably twitchy — so the yaw comes from `alpha`,
- * which is where the phone is pointing, and turning your body turns the room
- * by the same amount. The pitch stays on `beta`, where leaning is the gesture
- * anybody would make.
+ * Turning, and only turning. Reaching the door behind you and the TV beside
+ * you is most of a half turn, and no amount of leaning can mean that without
+ * becoming unusably twitchy — so the yaw comes from `alpha`, which is where
+ * the phone is pointing, and turning your body turns the room by the same
+ * amount.
+ *
+ * There is no vertical axis. A room seen from a seat is a horizontal thing:
+ * the floor and the ceiling hold nothing worth turning towards, and an axis
+ * that answers every wobble of a hand is an axis that never sits still.
  *
  * `alpha` costs what it always costs: it wraps at 360, so the difference from
  * the neutral is taken the short way round, and it drifts over minutes, which
@@ -28,11 +31,18 @@ import { quality } from '../Utils/flags.js'
  */
 const NEUTRAL_SAMPLES = 6
 
-/** How far to lean, in degrees, before the pitch is at its limit. */
-const PITCH_RANGE = 26
-
-/** Where the pitch tops out, so nobody ends up looking at the ceiling. */
-const PITCH_LIMIT = 22
+/**
+ * How far the room may turn, in degrees, and it is not symmetrical because
+ * the room is not.
+ *
+ * Measured rather than chosen: sweeping the overview station and asking where
+ * each thing lands on screen, the door with the notes sits dead centre at +40
+ * and the TV at -35. So those are the ends. Turn until the door is in front
+ * of you and it stops; turn the other way until the TV is and it stops. Past
+ * either there is only wall, and a limit that allows facing a blank wall is a
+ * limit that lets somebody wonder where the room went.
+ */
+const LIMIT = { min: -35, max: 40 }
 
 const DEG = Math.PI / 180
 
@@ -86,8 +96,8 @@ export default class Gyro
 
     read(event)
     {
-        const { alpha, beta } = event
-        if (alpha === null || beta === null) return
+        const { alpha } = event
+        if (alpha === null || alpha === undefined) return
 
         // A phone flat on a table reports nothing useful and a phone being
         // picked up reports the journey, so the rest position is averaged over
@@ -96,19 +106,18 @@ export default class Gyro
         {
             this.samples++
             this.neutral = this.neutral
-                ? { alpha: this.turn(alpha, this.neutral.alpha) / 2 + this.neutral.alpha,
-                    beta: (this.neutral.beta + beta) / 2 }
-                : { alpha, beta }
+                ? { alpha: this.turn(alpha, this.neutral.alpha) / 2 + this.neutral.alpha }
+                : { alpha }
             return
         }
 
-        const range = quality.gyroRange
-        const turned = Math.max(-range, Math.min(range, this.turn(alpha, this.neutral.alpha)))
-        const leaned = Math.max(-PITCH_LIMIT, Math.min(PITCH_LIMIT,
-            -(beta - this.neutral.beta) * (PITCH_LIMIT / PITCH_RANGE)))
+        // Flipped by default: on a phone, turning one way sent the room the
+        // other. The clamp is applied to the angle the camera will actually
+        // take, after that flip, so the ends stay the door and the TV however
+        // the reading arrives.
+        const turned = this.turn(alpha, this.neutral.alpha) * (quality.gyroFlipped ? 1 : -1)
 
-        this.camera.sweep.yaw = turned * DEG * (quality.gyroFlip ? -1 : 1)
-        this.camera.sweep.pitch = leaned * DEG
+        this.camera.sweep.yaw = Math.max(LIMIT.min, Math.min(LIMIT.max, turned)) * DEG
     }
 
     /** Degrees from `to` to `from`, the short way round the circle. */
