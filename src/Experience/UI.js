@@ -1,6 +1,7 @@
 import Experience from './Experience.js'
 import { isMobile } from './Utils/device.js'
 import { isTyping } from './Utils/typing.js'
+import { quality } from './Utils/flags.js'
 import Menu from './Menu.js'
 import { locale, strings, t } from './config/i18n.js'
 
@@ -44,6 +45,7 @@ export default class UI
         this.hint = document.getElementById('hint')
 
         if (isMobile) document.body.classList.add('mobile')
+        if (!quality.blur) document.body.classList.add('no-blur')
 
         document.documentElement.style.setProperty('--accent', this.experience.theme.accent)
 

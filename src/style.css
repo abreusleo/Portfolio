@@ -1700,3 +1700,17 @@ body:not(.mobile) [data-mobile] { display: none; }
     white-space: pre;
     pointer-events: none;
 }
+
+/* `?blur=0`. Every one of these composites a live blur of the 3D canvas
+   underneath it, which is cheap on a desktop and is not on a phone. The
+   switch exists to find out how much it costs on the device that is slow. */
+body.no-blur .panel-inner,
+body.no-blur #desktop,
+body.no-blur #menu,
+body.no-blur .dsk-win,
+body.no-blur .player-box,
+body.no-blur #compose
+{
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}

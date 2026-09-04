@@ -10,6 +10,7 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 
 import Experience from './Experience.js'
 import { WIRE_LAYER } from './World/Wireframe.js'
+import { quality } from './Utils/flags.js'
 
 /**
  * Entry reveal + vignette + film grain, applied after tone mapping.
@@ -208,7 +209,7 @@ export default class Renderer
             // on the single biggest allocation in the app, paid twice. The
             // difference between 2x and 4x on these surfaces is not worth what
             // 4x costs.
-            { type: THREE.HalfFloatType, samples: SAMPLES },
+            { type: THREE.HalfFloatType, samples: quality.samples ?? SAMPLES },
         )
 
         this.composer = new EffectComposer(this.instance, target)
@@ -238,7 +239,7 @@ export default class Renderer
         this.finalPass.uniforms.tWire.value = this.wireTarget.texture
 
         this.composer.addPass(this.renderPass)
-        this.composer.addPass(this.bloomPass)
+        if (quality.bloom) this.composer.addPass(this.bloomPass)
         this.composer.addPass(this.outputPass)
         this.composer.addPass(this.finalPass)
     }

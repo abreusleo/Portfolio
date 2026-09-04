@@ -1,4 +1,5 @@
 import EventEmitter from './EventEmitter.js'
+import { quality } from './flags.js'
 
 /**
  * How many pixels the framebuffer is allowed to be, before the pixel ratio is
@@ -41,6 +42,10 @@ export default class Sizes extends EventEmitter
 
     pickPixelRatio()
     {
+        // `?dpr` overrides everything below, budget included: it is a
+        // measurement switch, and a capped measurement measures the cap.
+        if (quality.pixelRatio !== null) return Math.max(0.5, quality.pixelRatio)
+
         const wanted = Math.min(window.devicePixelRatio || 1, 2)
         const area = this.width * this.height
         if (area <= 0) return wanted

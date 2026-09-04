@@ -3,6 +3,7 @@ import gsap from 'gsap'
 
 import Experience from './Experience.js'
 import stations from './config/stations.js'
+import { quality } from './Utils/flags.js'
 
 const _pos = new THREE.Vector3()
 const _tgt = new THREE.Vector3()
@@ -254,7 +255,7 @@ export default class Camera
         const horizontal = 2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(fov) / 2) * REFERENCE_ASPECT)
         const vertical = 2 * Math.atan(Math.tan(horizontal / 2) / aspect)
 
-        return Math.min(MAX_FOV, THREE.MathUtils.radToDeg(vertical))
+        return Math.min(quality.fovCap ?? MAX_FOV, THREE.MathUtils.radToDeg(vertical))
     }
 
     resize()
