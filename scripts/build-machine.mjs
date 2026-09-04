@@ -15,6 +15,8 @@ import { fileURLToPath } from 'node:url'
 
 import profile from '../src/Experience/config/profile.js'
 import projects from '../src/Experience/config/projects.js'
+import products from '../src/Experience/config/products.js'
+import content from '../src/Experience/config/content.js'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -65,12 +67,76 @@ function stack() {
     return Object.entries(profile.stack).map(([group, items]) => row(group, items.join(', '), 16))
 }
 
-/** The six applications, straight from the config the wall draws from. */
+/** Greedy wrap, so a paragraph stays inside the column the rules draw. */
+function wrap(text, indent) {
+    const lines = []
+    let line = ''
+    for (const word of String(text).split(' ')) {
+        if (line && (line + ' ' + word).length > WIDTH) { lines.push(indent + line); line = word }
+        else line = line ? line + ' ' + word : word
+    }
+    if (line) lines.push(indent + line)
+    return lines
+}
+
+/**
+ * `[label, value]` pairs, either half of which may be a { pt, en }.
+ *
+ * The dotted column is measured against the longest label in the group rather
+ * than fixed, because one label longer than the fixed width collapses its own
+ * run of dots to a single one and breaks the alignment for the whole block.
+ */
+function metaRows(meta, indent) {
+    const pairs = (meta ?? []).map(([label, value]) => [en(label), en(value)])
+    const pad = Math.max(16, ...pairs.map(([label]) => label.length + 1))
+    return pairs.map(([label, value]) => indent + row(label, value, pad))
+}
+
+/**
+ * One numbered entry: what it is called, what it is for, what it does, and
+ * the rows under it. The same four things the panel in the room shows, which
+ * is the whole point of generating this from the config the room reads.
+ */
+function entry(index, name, tag, body, meta) {
+    const number = String(index + 1).padStart(2, '0')
+    const lines = [`[${number}] ${name} — ${en(tag)}`, '']
+    for (const paragraph of en(body) ?? []) lines.push(...wrap(paragraph, '     '), '')
+    lines.push(...metaRows(meta, '     '))
+    return [...lines, '']
+}
+
 function applications() {
-    return projects.map((project, index) => {
-        const number = String(index + 1).padStart(2, '0')
-        return `[${number}] ${project.name.padEnd(6)} ${en(project.tag)}`
-    })
+    return projects.flatMap((project, i) => entry(i, project.name, project.tag, project.body, project.meta))
+}
+
+function productList() {
+    return products.flatMap((product, i) => entry(i, product.name, product.tag, product.body, product.meta))
+}
+
+/** A panel's prose, as the room shows it. */
+function prose(key, indent) {
+    return (en(content[key].body) ?? []).flatMap((paragraph) => [...wrap(paragraph, indent ?? ''), ''])
+}
+
+/**
+ * The lead line of an overview panel. Its last paragraph is the room telling
+ * the visitor to click something, which means nothing on a page of text.
+ */
+function lead(key) {
+    return wrap((en(content[key].body) ?? [])[0] ?? '', '')
+}
+
+/** The markdown twin of entry(), for llms.txt. */
+function mdEntry(name, tag, body, meta) {
+    const lines = [`### ${name}`, '', `_${en(tag)}_`, '']
+    for (const paragraph of en(body) ?? []) lines.push(paragraph, '')
+    for (const [label, value] of meta ?? []) lines.push(`- **${en(label)}** — ${en(value)}`)
+    return lines.join('\n')
+}
+
+/** A panel's prose as markdown paragraphs. */
+function mdProse(key) {
+    return (en(content[key].body) ?? []).join('\n' + '\n')
 }
 
 function links() {
@@ -94,19 +160,14 @@ const body = [
         '',
         ...profile.summary,
     ]),
-    section('EXPERIENCE', experience()),
+    section('EXPERIENCE', [...prose('work'), ...experience()]),
     section('EDUCATION', education()),
     section('AWARDS', profile.awards.map((award) => `· ${award}`)),
     section('STACK', stack()),
-    section('APPLICATIONS', [
-        'Six applications on one VPS. Hub is the front door; the rest live behind it.',
-        '',
-        ...applications(),
-    ]),
-    section('PRODUCTS', [
-        '[01] Bios Health .. multi-tenant SaaS for running a hospital operating theatre',
-        '[02] Surviving .... first-person post-apocalyptic survival game (s&box / Source 2)',
-    ]),
+    section('APPLICATIONS', [...lead('prints'), '', ...applications()]),
+    section('PRODUCTS', [...lead('products'), '', ...productList()]),
+    section('ABOUT', [...prose('about'), ...metaRows(content.about.meta, '')]),
+    section('QUOTE', prose('board')),
     section('LINKS', links()),
     section('FOR_AGENTS', [
         row('llms.txt', '<a href="./llms.txt">/llms.txt</a>', 14),
@@ -155,26 +216,69 @@ ${body}</pre>
 
 const llms = `# ${profile.name}
 
-> ${profile.role} at ${profile.company}. ${profile.summary[0]}
+> ${profile.role} at ${profile.company}, based in ${profile.location}.
+
+This file, [the machine view](/machine.html) and the 3D room carry the same
+content: all three are generated from one set of configs.
 
 ## Pages
 
 - [Human view](/): an interactive 3D room, in Portuguese or English
-- [Machine view](/machine.html): plain-text mirror of everything below
+- [Machine view](/machine.html): the same content as plain text
 
-## Now
+## Summary
 
-${profile.experience[0].title} at ${profile.experience[0].company}, since ${profile.experience[0].from}.
-Based in ${profile.location}.
+${profile.summary.map((line) => `- ${line}`).join('\n')}
+
+## Experience
+
+${mdProse('work')}
+
+${profile.experience.map((job) => [
+    `### ${job.title} — ${job.company}`,
+    '',
+    `${job.employment} · ${job.from} — ${job.to}`,
+    ...(job.notes.length ? ['', ...job.notes.map((note) => `- ${note}`)] : []),
+].join('\n')).join('\n' + '\n')}
+
+## Education
+
+${profile.education.map((item) => [
+    `### ${item.title} — ${item.school}`,
+    '',
+    `${item.from} — ${item.to}`,
+    ...(item.notes.length ? ['', ...item.notes.map((note) => `- ${note}`)] : []),
+].join('\n')).join('\n' + '\n')}
+
+## Awards
+
+${profile.awards.map((award) => `- ${award}`).join('\n')}
+
+## Stack
+
+${Object.entries(profile.stack).map(([group, items]) => `- **${group}** — ${items.join(', ')}`).join('\n')}
 
 ## Applications
 
-${projects.map((p) => `- **${p.name}** — ${en(p.tag)}`).join('\n')}
+${(en(content.prints.body) ?? [])[0]}
+
+${projects.map((p) => mdEntry(p.name, p.tag, p.body, p.meta)).join('\n' + '\n')}
 
 ## Products
 
-- **Bios Health** — multi-tenant SaaS for running a hospital operating theatre in real time
-- **Surviving** — first-person post-apocalyptic survival game, built in s&box on Source 2
+${(en(content.products.body) ?? [])[0]}
+
+${products.map((p) => mdEntry(p.name, p.tag, p.body, p.meta)).join('\n' + '\n')}
+
+## About
+
+${mdProse('about')}
+
+${content.about.meta.map(([label, value]) => `- **${en(label)}** — ${en(value)}`).join('\n')}
+
+## Quote
+
+${mdProse('board')}
 
 ## Links
 

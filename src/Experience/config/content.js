@@ -1,4 +1,5 @@
 import projects from './projects.js'
+import products from './products.js'
 
 /**
  * Text shown in the side panel. Keys match the hotspot ids in Interactions.js.
@@ -23,52 +24,8 @@ const content = {
             ],
         },
         meta: [
-            [{ pt: 'Produtos', en: 'Products' }, '2'],
-            ['Bios Health', { pt: 'SaaS hospitalar', en: 'hospital SaaS' }],
-            ['Surviving', { pt: 'jogo em s&box', en: 'game in s&box' }],
-        ],
-    },
-
-    'product.01': {
-        eyebrow: { pt: 'Produto · 01', en: 'Product · 01' },
-        kicker: { pt: 'SaaS de centro cirúrgico', en: 'Operating theatre SaaS' },
-        title: 'Bios Health',
-        body: {
-            pt: [
-                'Plataforma multiempresa para gerir o centro cirúrgico de um hospital em tempo real. Acompanha a jornada inteira do paciente: agendamento, pré-operatório, cirurgia, recuperação na SRPA e alta.',
-                'Tudo isso vira um painel ao vivo para a diretoria, no lugar de planilha e relatório mensal. Documentos em PDF são lidos por visão computacional e viram dado estruturado sozinhos.',
-            ],
-            en: [
-                'A multi-tenant platform for running a hospital operating theatre in real time. It follows the whole patient journey: scheduling, pre-op, surgery, recovery and discharge.',
-                'All of it becomes a live board for the executive team, in place of a spreadsheet and a monthly report. PDFs are read by computer vision and turn into structured data on their own.',
-            ],
-        },
-        meta: [
-            ['Backend', 'Go · MySQL'],
-            ['Frontend', 'Next.js · React · TypeScript'],
-            ['Infra', 'Terraform · Kubernetes'],
-            [{ pt: 'Estado', en: 'Status' }, { pt: '1.000+ commits', en: '1,000+ commits' }],
-        ],
-    },
-
-    'product.02': {
-        eyebrow: { pt: 'Produto · 02', en: 'Product · 02' },
-        kicker: { pt: 'Jogo de sobrevivência', en: 'Survival game' },
-        title: 'Surviving',
-        body: {
-            pt: [
-                'Jogo de sobrevivência em primeira pessoa, pós-apocalíptico e com zumbis, para multiplayer assimétrico. A frase que resume é do próprio documento de design: sobreviva num mundo que quer te matar, com zumbis, o ambiente e às vezes outros jogadores.',
-                'O ciclo é avaliar fome, sede, temperatura, saúde e sanidade, sair para explorar e saquear, fabricar e reparar, e fortalecer uma posição antes da noite. Recursos escassos e morte permanente. O PvP existe, mas nunca é incentivado.',
-            ],
-            en: [
-                'A first-person post-apocalyptic survival game with zombies, built for asymmetric multiplayer. The line that sums it up comes from its own design document: survive a world that wants you dead — the zombies, the environment, and sometimes the other players.',
-                'The loop is reading hunger, thirst, temperature, health and sanity, going out to explore and loot, crafting and repairing, and hardening a position before night. Scarce resources and permanent death. PvP exists but is never encouraged.',
-            ],
-        },
-        meta: [
-            [{ pt: 'Motor', en: 'Engine' }, 's&box · Source 2'],
-            [{ pt: 'Linguagem', en: 'Language' }, 'C#'],
-            [{ pt: 'Estado', en: 'Status' }, { pt: 'em construção · repositório aberto', en: 'in progress · open repository' }],
+            [{ pt: 'Produtos', en: 'Products' }, String(products.length)],
+            ...products.map((product) => [product.name, product.tag]),
         ],
     },
 
@@ -173,6 +130,19 @@ const content = {
         ],
     },
 }
+
+products.forEach((product, index) =>
+{
+    const number = String(index + 1).padStart(2, '0')
+
+    content[`product.${number}`] = {
+        eyebrow: { pt: `Produto · ${number}`, en: `Product · ${number}` },
+        kicker: product.tag,
+        title: product.name,
+        body: product.body,
+        meta: product.meta,
+    }
+})
 
 projects.forEach((project, index) =>
 {

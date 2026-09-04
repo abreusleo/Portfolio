@@ -1,30 +1,192 @@
 # Leonardo Santos Abreu
 
-> Software Engineer Backend at Pismo, a Visa company. Backend software engineer working on core banking and card processing at Pismo.
+> Software Engineer Backend at Pismo, a Visa company, based in Rio de Janeiro, Brazil.
+
+This file, [the machine view](/machine.html) and the 3D room carry the same
+content: all three are generated from one set of configs.
 
 ## Pages
 
 - [Human view](/): an interactive 3D room, in Portuguese or English
-- [Machine view](/machine.html): plain-text mirror of everything below
+- [Machine view](/machine.html): the same content as plain text
 
-## Now
+## Summary
 
-Software Engineer Backend at Pismo, since Sep 2024.
-Based in Rio de Janeiro, Brazil.
+- Backend software engineer working on core banking and card processing at Pismo.
+- Day to day: services in Go, C# (.NET) and Python, with gRPC, Kubernetes, Amazon EKS and Istio.
+- Outside work: this portfolio, a survival game, and six applications running on one VPS.
+
+## Experience
+
+Backend software engineer at Pismo since 2024, the Brazilian core banking and card processing platform that is now part of Visa.
+
+It is the layer banks and fintechs use to issue cards, hold accounts and process transactions: the kind of system where the books have to balance, at the volume that makes balancing mean something.
+
+Before that, three years and eight months at Stone Age, from intern to engineer, on a SaaS that had to scale without falling over. Everything else I build happens outside working hours.
+
+### Software Engineer Backend — Pismo
+
+Full-time · Remote · Sep 2024 — Present
+
+- Core banking and card processing platform, part of Visa.
+
+### Software Engineer — Stone Age
+
+Full-time · Remote · Jan 2023 — Aug 2024
+
+- Scalable SaaS product: new features, shared libraries, stability against client SLAs.
+- Led the migration of a refactored service with zero downtime.
+- Fixed a memory leak triggered by dynamic tenant configuration updates.
+- Cut latency on a critical flow by 20% by removing redundant database calls and cold starts.
+
+### Software Developer Intern — Stone Age
+
+Internship · Jan 2021 — Dec 2022
+
+## Education
+
+### BEng, Computer Engineering — Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio)
+
+Jun 2017 — Jul 2023
+
+- Final thesis: basketball shot-map visualisation, in partnership with Flamengo (NBB).
+- Delivered a website and two new visualisations, replacing existing MATLAB ones.
+
+### Vocational course, Software Development — Step Computer Academy Brasil
+
+Jan 2017 — Jun 2020
+
+## Awards
+
+- 1st place — Startup Weekend, Três Rios (car wash delivery app)
+
+## Stack
+
+- **languages** — Go, C# / .NET, Python, TypeScript, Lua
+- **infrastructure** — Kubernetes, Amazon EKS, Istio, Docker, Terraform
+- **practice** — gRPC, Locust, unit testing, load testing
+- **graphics** — three.js, WebGL, GLSL, Vite
 
 ## Applications
 
-- **Hub** — Sign-in and the way between the tools
-- **Orb** — One place for the feeds, videos and newsletters
-- **Fin** — Spending, read from the real bank data
-- **Cal** — Calorie tracking that reads a photo
-- **Fut** — Football tactics board, online
-- **Lvl** — Runs the game servers
+Six applications on one server. Hub is the front door and the other five live behind it, with no login of their own.
+
+### Hub
+
+_Sign-in and the way between the tools_
+
+One account for every tool on the server. You sign in once and land on a portal showing what you can open, with no second login on the way in.
+
+It is also where accounts are created and revoked.
+
+- **Stack** — Go · Postgres
+- **Status** — 62 commits · in use
+
+### Orb
+
+_One place for the feeds, videos and newsletters_
+
+Everything you follow in one place: sites over RSS, YouTube channels, Twitch and Kick streams, Reddit communities and newsletters that arrive by email.
+
+Video lands on a timeline that separates what is live, what has aired and what is scheduled. Clean reading mode, publish alerts, and your existing list imports over OPML.
+
+- **Stack** — TypeScript · SQLite
+- **Front** — PWA
+- **Status** — 99 commits · the busiest
+
+### Fin
+
+_Spending, read from the real bank data_
+
+Reads your bank statement and shows where the money went: by category, by month, and what moved since last month. Including the subscriptions nobody noticed.
+
+Deliberately deterministic, with no language model in it.
+
+- **Stack** — Go · SQLite
+- **Front** — React · TypeScript · three.js
+- **Instance** — one per person
+
+### Cal
+
+_Calorie tracking that reads a photo_
+
+What you ate today, adding up against the target. Entry can be a photo of the plate or a sentence, and the app estimates portion and calories from it.
+
+Weight and measurements are tracked over time in the same place.
+
+- **Stack** — Go · Postgres
+- **Status** — 18 commits
+
+### Fut
+
+_Football tactics board, online_
+
+A football tactics board that works online. It is for picking the side, walking through a move and settling where everyone stands, with each of you at home.
+
+The touchline board, moved onto the internet. Instead of scribbling on one and hoping everybody read it the same way, you all open the same pitch and watch the move from whatever angle you like.
+
+- **Stack** — Go · WebSocket · three.js
+- **Status** — 73 commits
+
+### Lvl
+
+_Runs the game servers_
+
+Starts and stops the house game servers without anybody opening a terminal. Shows who is on, what the box can take, and backs the world up.
+
+It serves Minecraft, Factorio and Project Zomboid.
+
+- **Stack** — Go · Docker
+- **Games** — Minecraft · Factorio · Zomboid
+- **Status** — live
 
 ## Products
 
-- **Bios Health** — multi-tenant SaaS for running a hospital operating theatre in real time
-- **Surviving** — first-person post-apocalyptic survival game, built in s&box on Source 2
+Two things that exist outside the personal server: a hospital SaaS and a game being built.
+
+### Bios Health
+
+_Operating theatre SaaS_
+
+A multi-tenant platform for running a hospital operating theatre in real time. It follows the whole patient journey: scheduling, pre-op, surgery, recovery and discharge.
+
+All of it becomes a live board for the executive team, in place of a spreadsheet and a monthly report. PDFs are read by computer vision and turn into structured data on their own.
+
+- **Backend** — Go · MySQL
+- **Frontend** — Next.js · React · TypeScript
+- **Infra** — Terraform · Kubernetes
+- **Status** — 1,000+ commits
+
+### Surviving
+
+_Survival game_
+
+A first-person post-apocalyptic survival game with zombies, built for asymmetric multiplayer. The line that sums it up comes from its own design document: survive a world that wants you dead — the zombies, the environment, and sometimes the other players.
+
+The loop is reading hunger, thirst, temperature, health and sanity, going out to explore and loot, crafting and repairing, and hardening a position before night. Scarce resources and permanent death. PvP exists but is never encouraged.
+
+- **Engine** — s&box · Source 2
+- **Language** — C#
+- **Status** — in progress · open repository
+
+## About
+
+Computer engineer, born in Rio, Fluminense supporter.
+
+In love with sport, competition and games. The thread running through them is the contest, the format that ends with a score.
+
+I live between studying, competing and having fun.
+
+- **Degree** — Computer Engineering
+- **Based in** — Rio de Janeiro
+- **Club** — Fluminense
+- **Away from the keyboard** — sport · competition · games
+
+## Quote
+
+"The biggest things in life have been achieved by people who, at the start, we would have judged crazy. And yet if they had not had these crazy ideas the world would have been more stupid."
+
+Wenger was talking about football, but the line is not about football. It is about the distance between looking mad at the start and looking obvious at the end.
 
 ## Links
 

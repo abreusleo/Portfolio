@@ -22,7 +22,7 @@ export const strings = {
     loading: { pt: 'iniciando', en: 'starting' },
     ready: { pt: 'pronto', en: 'ready' },
     enter: { pt: 'ENTRAR', en: 'ENTER' },
-    role: { pt: 'creative developer', en: 'creative developer' },
+    role: { pt: 'Software Engineer Backend', en: 'Backend Software Engineer' },
 
     explore: { pt: 'EXPLORAR', en: 'EXPLORE' },
     exploreBack: { pt: 'VOLTAR', en: 'BACK' },
@@ -38,9 +38,7 @@ export const strings = {
     previous: { pt: 'Anterior', en: 'Previous' },
     next: { pt: 'Próximo', en: 'Next' },
 
-    videoMissing: { pt: 'Vídeo ainda não adicionado', en: 'Video not added yet' },
-    videoPath: { pt: 'Coloque o arquivo em', en: 'Drop the file in' },
-    videoPending: { pt: 'pendente', en: 'pending' },
+    videoMissing: { pt: 'Demonstração ainda não publicada', en: 'Demo not published yet' },
 
     // Hotspot tooltips
     seeShelves: { pt: 'Produtos', en: 'Products' },
@@ -56,8 +54,8 @@ export const strings = {
     // The composer
     composeTitle: { pt: 'Deixe um recado', en: 'Leave a note' },
     composeHint: {
-        pt: 'Fica na porta, para quem vier depois. Sem link, até 140 caracteres.',
-        en: 'It goes on the door, for whoever comes next. No links, 140 characters.',
+        pt: 'Fica na porta, para quem vier depois.',
+        en: 'It goes on the door, for whoever comes next.',
     },
     composePlaceholder: { pt: 'escreva aqui…', en: 'write here…' },
     composeNamePlaceholder: { pt: 'seu nome (opcional)', en: 'your name (optional)' },
@@ -84,8 +82,8 @@ export const strings = {
     eggsLabelOne: { pt: 'segredo encontrado', en: 'secret found' },
     eggsLabelMany: { pt: 'segredos encontrados', en: 'secrets found' },
     composeFull: {
-        pt: 'A porta está cheia. O seu vai no lugar do mais antigo.',
-        en: 'The door is full. Yours takes the oldest one place.',
+        pt: 'A porta está cheia. O seu entra do mesmo jeito.',
+        en: 'The door is full. Yours goes up all the same.',
     },
     placeHint: {
         pt: 'Arraste o post-it para onde quiser colar',

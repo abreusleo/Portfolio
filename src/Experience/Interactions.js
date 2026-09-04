@@ -1196,7 +1196,6 @@ class VideoPlayer
         this.root = document.getElementById('player')
         this.video = document.getElementById('player-video')
         this.fallback = document.getElementById('player-fallback')
-        this.fallbackPath = document.getElementById('player-path')
         this.closeButton = document.getElementById('player-close')
         this.titleEl = document.getElementById('player-title')
         this.noteEl = document.getElementById('player-note')
@@ -1299,7 +1298,6 @@ class VideoPlayer
 
         this.video.classList.add('hidden')
         this.fallback.classList.remove('hidden')
-        this.fallbackPath.textContent = `static/video/${item.file}`
         this.buttons[this.current].classList.add('missing')
     }
 
