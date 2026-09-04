@@ -3,6 +3,7 @@ import { isMobile } from './Utils/device.js'
 import { isTyping } from './Utils/typing.js'
 import { quality } from './Utils/flags.js'
 import Menu from './Menu.js'
+import Views from './Views.js'
 import { locale, strings, t } from './config/i18n.js'
 
 const BAR_CELLS = 34
@@ -72,6 +73,7 @@ export default class UI
         // Built last: it reads the hotspots, and Interactions registers
         // those when the world finishes, which is after all of this.
         this.menu = new Menu()
+        this.views = new Views()
 
         // The eggs are built as one of the world's steps, so they do not exist
         // yet when this runs.

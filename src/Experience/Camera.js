@@ -12,6 +12,23 @@ const _dummy = new THREE.PerspectiveCamera()
 const _up = new THREE.Vector3(0, 1, 0)
 
 /**
+ * The three ways the overview station can face, in degrees of sweep.
+ *
+ * Measured, not chosen: sweeping the camera and asking where each thing lands
+ * on screen puts the door with the notes dead centre at +40 and the TV at -35.
+ * Zero is how the station was framed, which is the desk and the wall of prints.
+ *
+ * They are not symmetrical because the room is not, and they are the ends for
+ * everything that sweeps — the arrows step between them, the gyro is clamped
+ * to the outer two, so neither can reach a wall with nothing on it.
+ */
+export const VIEWS = [
+    { id: 'door', yaw: 40 },
+    { id: 'desk', yaw: 0 },
+    { id: 'tv', yaw: -35 },
+]
+
+/**
  * How fast the parked camera follows the pointer, per second.
  *
  * These were per-frame lerp factors, which tied the motion to the frame rate:

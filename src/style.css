@@ -1714,3 +1714,55 @@ body.no-blur #compose
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
 }
+
+/* ---------------------------------------------------------------------------
+   The two arrows
+
+   Three ways to face the room, for a thumb. The gyro is the better gesture
+   where it works, and is worth nothing to somebody who declined the
+   permission, is holding the phone flat, or is on a device that reports the
+   turn backwards. Same three angles either way.
+
+   Halfway up the side rather than at the bottom: the bottom of a phone is
+   where the browser puts its own bar, and where this room already puts
+   EXPLORAR. --------------------------------------------------------------- */
+.view-arrow
+{
+    position: fixed;
+    /* Low, not centred. Everything in the room projects between a third and
+       a little past half way down a phone, and an arrow parked in the middle
+       of that swallows the tap meant for whatever is behind it — the Work
+       hotspot sat under the right one exactly. Down here there is floor. */
+    top: 74%;
+    transform: translateY(-50%);
+    z-index: 22;
+    width: 2.6rem;
+    height: 3.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(11, 12, 14, 0.55);
+    border: 1px solid rgba(233, 231, 227, 0.16);
+    color: var(--fg);
+    font-family: var(--font);
+    font-size: 1.5rem;
+    line-height: 1;
+    pointer-events: auto;
+    cursor: pointer;
+    transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+.view-prev { left: 0; border-left: 0; }
+.view-next { right: 0; border-right: 0; }
+
+.view-arrow:active { border-color: var(--accent); color: var(--accent); }
+
+/* Dimmed and inert at the ends, not removed: an arrow that vanishes moves the
+   other one under the thumb that was reaching for it. */
+.view-arrow:disabled
+{
+    opacity: 0.22;
+    pointer-events: none;
+}
+
+/* No rule needed to hide them with the loader: they sit inside #hud, which
+   already carries that. */

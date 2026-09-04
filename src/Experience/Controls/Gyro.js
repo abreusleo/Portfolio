@@ -1,6 +1,7 @@
 import Experience from '../Experience.js'
 import { isMobile } from '../Utils/device.js'
 import { quality } from '../Utils/flags.js'
+import { VIEWS } from '../Camera.js'
 
 /**
  * Look around by tilting the phone.
@@ -31,18 +32,11 @@ import { quality } from '../Utils/flags.js'
  */
 const NEUTRAL_SAMPLES = 6
 
-/**
- * How far the room may turn, in degrees, and it is not symmetrical because
- * the room is not.
- *
- * Measured rather than chosen: sweeping the overview station and asking where
- * each thing lands on screen, the door with the notes sits dead centre at +40
- * and the TV at -35. So those are the ends. Turn until the door is in front
- * of you and it stops; turn the other way until the TV is and it stops. Past
- * either there is only wall, and a limit that allows facing a blank wall is a
- * limit that lets somebody wonder where the room went.
- */
-const LIMIT = { min: -35, max: 40 }
+/** The ends are the two outer views: turn to the door, or to the TV. */
+const LIMIT = {
+    min: Math.min(...VIEWS.map((v) => v.yaw)),
+    max: Math.max(...VIEWS.map((v) => v.yaw)),
+}
 
 const DEG = Math.PI / 180
 
@@ -115,9 +109,33 @@ export default class Gyro
         // other. The clamp is applied to the angle the camera will actually
         // take, after that flip, so the ends stay the door and the TV however
         // the reading arrives.
-        const turned = this.turn(alpha, this.neutral.alpha) * (quality.gyroFlipped ? 1 : -1)
+        this.last = alpha
+
+        const turned = this.turn(alpha, this.neutral.alpha) * this.sign
 
         this.camera.sweep.yaw = Math.max(LIMIT.min, Math.min(LIMIT.max, turned)) * DEG
+    }
+
+    get sign()
+    {
+        return quality.gyroFlipped ? 1 : -1
+    }
+
+    /**
+     * Makes wherever the phone is pointing right now mean `yaw`.
+     *
+     * The arrows and this control the same angle, and without it the one the
+     * visitor pressed would be overwritten by the next reading, half a frame
+     * later — a button that visibly does nothing. Re-anchoring instead means
+     * the view they chose becomes the rest position and turning still works
+     * from there, inside the same limits.
+     */
+    anchorTo(yaw)
+    {
+        if (!this.active || this.last === undefined) return
+
+        this.neutral = { alpha: (this.last - yaw / this.sign + 360) % 360 }
+        this.samples = NEUTRAL_SAMPLES
     }
 
     /** Degrees from `to` to `from`, the short way round the circle. */
