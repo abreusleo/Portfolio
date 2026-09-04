@@ -414,11 +414,35 @@ export default class Interactions
         const hotspot = this.hovered
         this.clearHover()
 
+        // Clicking a child in the room while its group is closed opens the
+        // group first: in the scene you are standing in front of a wall of
+        // six, and stepping to the wall before the one is what the eye
+        // expects. A list has no wall, so the menu skips this and goes
+        // straight to what was named.
+        if (hotspot.kind !== 'group' && hotspot.group && this.activeGroup !== hotspot.group)
+        {
+            this.openGroup(hotspot.group)
+            return
+        }
+
+        this.open(hotspot)
+    }
+
+    /**
+     * Everything that can be opened, and the only place that decides how.
+     *
+     * The room and the menu both come through here on purpose: two lists of
+     * the same branches drift, and the day they do, one of the two surfaces
+     * starts doing something subtly different with the same object.
+     */
+    open(hotspot)
+    {
+        if (!hotspot) return
+
         if (hotspot.kind === 'compose') this.openCompose()
         else if (hotspot.kind === 'video') this.openVideo()
         else if (hotspot.kind === 'desktop') this.openDesktop()
         else if (hotspot.kind === 'group') this.openGroup(hotspot.id)
-        else if (hotspot.group && this.activeGroup !== hotspot.group) this.openGroup(hotspot.group)
         else this.openDetail(hotspot.id)
     }
 

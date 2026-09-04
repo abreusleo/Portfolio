@@ -104,6 +104,12 @@ export const strings = {
     laptopRole: { pt: 'SOFTWARE ENGINEER BACKEND', en: 'BACKEND SOFTWARE ENGINEER' },
     laptopDomain: { pt: 'core banking e cartões', en: 'core banking and cards' },
 
+    // The menu
+    menuOpen: { pt: 'IR PARA', en: 'GO TO' },
+    menuTitle: { pt: 'Lugares da sala', en: 'Places in the room' },
+    menuClose: { pt: 'Fechar menu', en: 'Close menu' },
+    menuAll: { pt: 'ver todos', en: 'see all' },
+
     langLabel: { pt: 'Idioma', en: 'Language' },
 }
 
