@@ -150,13 +150,17 @@ export default class Camera
         const startPos = cam.position.clone()
         const startQuat = cam.quaternion.clone()
         const startFov = cam.fov
+        // Kept as the number the station was authored with, not as the angle
+        // it resolves to today: resize() and the tween below both have to be
+        // able to ask again for a viewport that changed since.
+        this.authoredFov = station.fov ?? this.authoredFov ?? null
 
         const endPos = new THREE.Vector3().fromArray(station.position)
         const target = new THREE.Vector3().fromArray(station.target)
         _dummy.position.copy(endPos)
         _dummy.lookAt(target)
         const endQuat = _dummy.quaternion.clone()
-        const endFov = station.fov ? this.fovFor(station.fov) : startFov
+        const endFov = () => (this.authoredFov ? this.fovFor(this.authoredFov) : startFov)
 
         const finish = () =>
         {
@@ -170,7 +174,7 @@ export default class Camera
         {
             cam.position.copy(endPos)
             cam.quaternion.copy(endQuat)
-            cam.fov = endFov
+            cam.fov = endFov()
             cam.updateProjectionMatrix()
             finish()
             return Promise.resolve()
@@ -187,7 +191,11 @@ export default class Camera
                 {
                     cam.position.lerpVectors(startPos, endPos, state.t)
                     cam.quaternion.slerpQuaternions(startQuat, endQuat, state.t)
-                    cam.fov = startFov + (endFov - startFov) * state.t
+                    // Asked every frame rather than captured once. A phone that
+                    // resizes during the 2.8s arrival used to have the correction
+                    // written by resize() overwritten right back, and stayed wrong
+                    // until the page was reloaded.
+                    cam.fov = startFov + (endFov() - startFov) * state.t
                     cam.updateProjectionMatrix()
                 },
                 onComplete: () =>
@@ -265,7 +273,8 @@ export default class Camera
         // A rotated phone is a different frame, not just a different size, so
         // the station has to be re-read rather than left at what the last
         // orientation needed.
-        if (this.mode !== 'fly' && this.station?.fov) this.instance.fov = this.fovFor(this.station.fov)
+        const authored = this.authoredFov ?? this.station?.fov
+        if (this.mode !== 'fly' && authored) this.instance.fov = this.fovFor(authored)
 
         this.instance.updateProjectionMatrix()
     }

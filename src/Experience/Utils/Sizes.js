@@ -26,11 +26,32 @@ export default class Sizes extends EventEmitter
 
         this.measure()
 
-        window.addEventListener('resize', () =>
+        const settle = () =>
         {
             this.measure()
             this.trigger('resize')
+        }
+
+        window.addEventListener('resize', settle)
+
+        /**
+         * A phone reports its new shape late, and by more than one route.
+         *
+         * orientationchange arrives before the viewport has finished turning,
+         * so reading it there measures the old frame; two frames later it is
+         * the new one. And the address bar sliding away resizes what the page
+         * can actually see without always resizing the window, which is the
+         * visualViewport. Listening to window resize alone leaves the camera
+         * framed for a viewport that is no longer there, and nothing corrects
+         * it until the page is loaded again — which is what a reload was
+         * quietly fixing.
+         */
+        window.addEventListener('orientationchange', () =>
+        {
+            requestAnimationFrame(() => requestAnimationFrame(settle))
         })
+
+        window.visualViewport?.addEventListener('resize', settle)
     }
 
     measure()
