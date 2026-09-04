@@ -87,6 +87,10 @@ export default class Camera
 
         window.addEventListener('touchmove', (e) =>
         {
+            // The gyro writes the same pointer, and a finger dragged across
+            // the glass while the phone is being tilted is two hands on one
+            // wheel.
+            if (this.gyro?.active) return
             if (this.mode !== 'overview') return
             const t = e.touches[0]
             this.pointer.set(

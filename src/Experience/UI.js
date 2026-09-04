@@ -305,6 +305,10 @@ export default class UI
         this.entered = true
         this.remember()
 
+        // Asked from this tap because iOS grants it only from a gesture.
+        // Denied, dismissed or unsupported all continue below unchanged.
+        this.experience.gyro?.request().catch(() => {})
+
         this.loader.classList.add('hidden')
         if (!this.shotMode) this.hud.classList.remove('hidden')
         this.camera.enter(instant ? 0 : 2.8)

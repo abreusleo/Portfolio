@@ -13,6 +13,7 @@ import World from './World/World.js'
 import Interactions from './Interactions.js'
 import UI from './UI.js'
 import Meter from './Utils/Meter.js'
+import Gyro from './Controls/Gyro.js'
 import { pickTheme } from './World/Themes.js'
 
 let instance = null
@@ -53,6 +54,8 @@ export default class Experience
         this.controls = new FreeFlyControls()
         this.world = new World()
         this.interactions = new Interactions()
+        this.gyro = new Gyro()
+        this.camera.gyro = this.gyro
         this.meter = new Meter()
         this.meter.renderer = this.renderer
         this.ui = new UI()
