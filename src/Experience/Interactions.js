@@ -7,6 +7,7 @@ import content from './config/content.js'
 import { emblemSvg } from './config/emblems.js'
 import { locale, strings, t } from './config/i18n.js'
 import { api, enabled as notesEnabled, MAX_LENGTH, wall } from './config/notes.js'
+import { isTyping } from './Utils/typing.js'
 import Desktop from './Desktop.js'
 
 /**
@@ -197,6 +198,11 @@ export default class Interactions
                 else if (this.activeGroup) this.close()
                 return
             }
+
+            // Escape above goes on working while writing: it is how the
+            // composer is closed. Everything below here is navigation, and
+            // navigation belongs to the field while somebody is typing in it.
+            if (isTyping()) return
 
             if (!this.detailOpen || !this.detailNav) return
             if (e.code === 'ArrowLeft') this.detailNav.prev()

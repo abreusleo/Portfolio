@@ -1,5 +1,6 @@
 import Experience from './Experience.js'
 import { isMobile } from './Utils/device.js'
+import { isTyping } from './Utils/typing.js'
 import { locale, strings, t } from './config/i18n.js'
 
 const BAR_CELLS = 34
@@ -126,7 +127,7 @@ export default class UI
     {
         document.addEventListener('keydown', (e) =>
         {
-            if (e.code !== 'KeyF' || isMobile || !this.entered) return
+            if (e.code !== 'KeyF' || isMobile || !this.entered || isTyping()) return
             if (this.camera.mode === 'overview') this.controls.enable()
         })
 

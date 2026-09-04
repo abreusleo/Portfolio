@@ -4,6 +4,7 @@ import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockCont
 import EventEmitter from '../Utils/EventEmitter.js'
 import Experience from '../Experience.js'
 import { isMobile } from '../Utils/device.js'
+import { isTyping } from '../Utils/typing.js'
 import { bounds } from '../config/layout.js'
 
 /**
@@ -66,7 +67,9 @@ export default class FreeFlyControls extends EventEmitter
                 case 'ShiftLeft': case 'ShiftRight': this.move.down = value; break
             }
         }
-        document.addEventListener('keydown', (e) => { if (this.active) setKey(e.code, true) })
+        // keyup is deliberately not guarded: a key held when a field took
+        // focus still has to be released, or it stays down for good.
+        document.addEventListener('keydown', (e) => { if (this.active && !isTyping()) setKey(e.code, true) })
         document.addEventListener('keyup', (e) => setKey(e.code, false))
     }
 
