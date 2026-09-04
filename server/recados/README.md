@@ -91,14 +91,12 @@ por isso que ele conhece CORS.
 
 ## Caddy
 
-Um host. A parede é pública, e todo o resto responde 404.
+Um host, dois ramos. A parede é pública; `/admin` fica atrás do mesmo portão
+de sempre, e o serviço confere o `Remote-User` contra `RECADOS_ADMINS`.
 
-`/admin` **não é roteado**, e isso é deliberado: o `(protected)` do Hub chama
-`/verify?app=recados`, e `recados` não está no `knownApps` do hub-auth, então
-toda requisição seria recusada independente de quem mandasse. Um ramo assim
-parece portão e se comporta como parede. Publicar o admin exige antes somar o
-app ao enum do hub-auth e uma tile no hub-web; até lá quem guarda o mural são
-as listas compiladas no serviço.
+O admin não tem tile no portal: as rotas respondem JSON e não têm página, então
+uma tile levaria quem clicasse a um 404. Chega-se nelas por `curl` com o cookie
+de sessão, depois de `make grant USER=x APP=recados` no Hub.
 
 ```caddyfile
 msg.leo-abreu.com {
@@ -113,7 +111,7 @@ msg.leo-abreu.com {
 	}
 
 	handle {
-		respond 404
+		import protected recados - recados:8080
 	}
 }
 ```
