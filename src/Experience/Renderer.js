@@ -239,9 +239,30 @@ export default class Renderer
         this.finalPass.uniforms.tWire.value = this.wireTarget.texture
 
         this.composer.addPass(this.renderPass)
-        if (quality.bloom) this.composer.addPass(this.bloomPass)
+        // Always in the chain, switched by `enabled`: a pass that has to be
+        // added and removed cannot be changed while the room is running,
+        // and Quality changes it while the room is running.
+        this.composer.addPass(this.bloomPass)
+        this.bloomPass.enabled = quality.bloom
         this.composer.addPass(this.outputPass)
         this.composer.addPass(this.finalPass)
+    }
+
+    /**
+     * Multisampling on the two composer targets, changed after the fact.
+     *
+     * Resizing a target reallocates it; setting samples does not, so the
+     * dispose is what makes the new count take. Both targets or neither —
+     * the composer swaps between them every frame.
+     */
+    setSamples(samples)
+    {
+        for (const target of [this.composer.renderTarget1, this.composer.renderTarget2])
+        {
+            if (target.samples === samples) continue
+            target.samples = samples
+            target.dispose()
+        }
     }
 
     setDebug()

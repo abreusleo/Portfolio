@@ -163,8 +163,19 @@ export default class World extends EventEmitter
         // draws them, with the models in.
         this.experience.renderer.instance.shadowMap.needsUpdate = true
 
+        // Drawing starts here, and the gate opens four lines further down.
+        // Between the two the room is rendering full frames with the loader
+        // still over the canvas — which is the only moment the ladder can be
+        // walked without the visitor watching it happen. Stepping down in
+        // front of somebody means the first thing they are shown is the
+        // version that had to be abandoned, and on a portfolio the first
+        // thing shown is the whole point.
         this.dressed = true
         this.experience.renderer.world = this
+
+        this.trigger('step', { pt: 'ajustando', en: 'tuning' })
+        await this.experience.quality.calibrate()
+
         this.trigger('dressed')
     }
 

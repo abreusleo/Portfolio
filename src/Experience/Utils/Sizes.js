@@ -24,6 +24,11 @@ export default class Sizes extends EventEmitter
     {
         super()
 
+        // Set by Quality. A plain multiplier rather than a fixed number so
+        // it survives a resize: the budget and the device's own ratio are
+        // still what decide the size, and this only says how much of it.
+        this.scale = 1
+
         this.measure()
 
         const settle = () =>
@@ -72,6 +77,6 @@ export default class Sizes extends EventEmitter
         if (area <= 0) return wanted
 
         // Never below 1: a blurry scene is worse than a heavy one.
-        return Math.max(1, Math.min(wanted, Math.sqrt(PIXEL_BUDGET / area)))
+        return Math.max(0.5, Math.min(wanted, Math.sqrt(PIXEL_BUDGET / area)) * this.scale)
     }
 }

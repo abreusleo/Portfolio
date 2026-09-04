@@ -44,6 +44,9 @@ function flag(name, fallback)
 }
 
 export const quality = {
+    // Screenshots have to be the same picture every time. A tier measured
+    // on whichever machine took them is not that.
+    shot: params.has('shot'),
     pixelRatio: number('dpr', null),
     samples: number('msaa', null),
     bloom: flag('bloom', true),

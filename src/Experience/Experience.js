@@ -14,6 +14,7 @@ import Interactions from './Interactions.js'
 import UI from './UI.js'
 import Meter from './Utils/Meter.js'
 import Gyro from './Controls/Gyro.js'
+import Quality from './Quality.js'
 import { pickTheme } from './World/Themes.js'
 
 let instance = null
@@ -54,6 +55,7 @@ export default class Experience
         this.controls = new FreeFlyControls()
         this.world = new World()
         this.interactions = new Interactions()
+        this.quality = new Quality()
         this.gyro = new Gyro()
         this.camera.gyro = this.gyro
         this.meter = new Meter()
@@ -74,6 +76,7 @@ export default class Experience
     update()
     {
         this.meter.tick()
+        this.quality.update(this.time.delta)
         this.controls.update(this.time.delta)
         this.camera.update()
         this.world.update()
