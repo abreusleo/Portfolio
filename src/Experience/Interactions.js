@@ -182,6 +182,14 @@ export default class Interactions
             if (moved > 6) return
 
             this.setPointer(e)
+
+            // A finger never hovers. pointermove is skipped for touch above,
+            // and what select() reads is the hover the frame loop computed —
+            // which, for a tap, is whatever was under a pointer that was never
+            // there. Refreshing it here is what makes the room answer a touch
+            // at all: without this line every tap in the scene does nothing.
+            if (e.pointerType !== 'mouse') this.update()
+
             this.select()
         })
 

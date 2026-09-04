@@ -22,6 +22,24 @@ const _dummy = new THREE.PerspectiveCamera()
 const FOLLOW = { pointer: 3.6, position: 9, scale: 12 }
 
 /**
+ * The shape every station in config/stations.js was framed for.
+ *
+ * three.js measures fov vertically, so a narrower window does not letterbox
+ * the same picture — it cuts the sides off. The overview station reads 49
+ * degrees, which is 79 across on a 16:9 monitor and 30 across on a phone held
+ * upright: less than half the room, with most of what the visitor came to see
+ * outside the frame. Eight of the seventeen hotspots simply were not on the
+ * screen.
+ *
+ * So the authored number is treated as a horizontal intent and converted back
+ * to whatever vertical angle preserves it. The cap is what keeps that from
+ * turning into a fisheye: holding the full width on a tall phone would ask for
+ * 108 degrees vertically, and the room bends visibly long before that.
+ */
+const REFERENCE_ASPECT = 16 / 9
+const MAX_FOV = 80
+
+/**
  * Camera with modes:
  *  - 'intro'      : static, waiting for the user to enter
  *  - 'transition' : gsap tween between stations
@@ -52,6 +70,7 @@ export default class Camera
         this.parallaxTarget = 1
 
         this.instance = new THREE.PerspectiveCamera(stations.intro.fov, this.sizes.width / this.sizes.height, 0.1, 60)
+        this.instance.fov = this.fovFor(stations.intro.fov)
         this.instance.position.fromArray(stations.intro.position)
         this.instance.lookAt(this.lookTarget)
         this.scene.add(this.instance)
@@ -136,7 +155,7 @@ export default class Camera
         _dummy.position.copy(endPos)
         _dummy.lookAt(target)
         const endQuat = _dummy.quaternion.clone()
-        const endFov = station.fov ?? startFov
+        const endFov = station.fov ? this.fovFor(station.fov) : startFov
 
         const finish = () =>
         {
@@ -223,9 +242,30 @@ export default class Camera
         this.instance.lookAt(this.lookTarget)
     }
 
+    /**
+     * The vertical angle that keeps a station's authored width on this screen.
+     * Wider screens than the reference get the number as written.
+     */
+    fovFor(fov)
+    {
+        const aspect = this.sizes.width / this.sizes.height
+        if (!(aspect > 0) || aspect >= REFERENCE_ASPECT) return fov
+
+        const horizontal = 2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(fov) / 2) * REFERENCE_ASPECT)
+        const vertical = 2 * Math.atan(Math.tan(horizontal / 2) / aspect)
+
+        return Math.min(MAX_FOV, THREE.MathUtils.radToDeg(vertical))
+    }
+
     resize()
     {
         this.instance.aspect = this.sizes.width / this.sizes.height
+
+        // A rotated phone is a different frame, not just a different size, so
+        // the station has to be re-read rather than left at what the last
+        // orientation needed.
+        if (this.mode !== 'fly' && this.station?.fov) this.instance.fov = this.fovFor(this.station.fov)
+
         this.instance.updateProjectionMatrix()
     }
 }
