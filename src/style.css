@@ -1681,3 +1681,22 @@ body:not(.mobile) [data-mobile] { display: none; }
 
     #desktop-exit { align-self: flex-end; }
 }
+
+/* Frame times on the glass, behind `?perf`. Deliberately plain and always on
+   top: it is an instrument, not part of the room. */
+.meter
+{
+    position: fixed;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 100;
+    padding: 0.4rem 0.6rem;
+    background: rgba(0, 0, 0, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #3dff74;
+    font-family: var(--font);
+    font-size: 0.66rem;
+    line-height: 1.5;
+    white-space: pre;
+    pointer-events: none;
+}

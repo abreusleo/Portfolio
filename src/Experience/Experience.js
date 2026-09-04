@@ -12,6 +12,7 @@ import FreeFlyControls from './Controls/FreeFlyControls.js'
 import World from './World/World.js'
 import Interactions from './Interactions.js'
 import UI from './UI.js'
+import Meter from './Utils/Meter.js'
 import { pickTheme } from './World/Themes.js'
 
 let instance = null
@@ -52,6 +53,8 @@ export default class Experience
         this.controls = new FreeFlyControls()
         this.world = new World()
         this.interactions = new Interactions()
+        this.meter = new Meter()
+        this.meter.renderer = this.renderer
         this.ui = new UI()
 
         // Events
@@ -67,6 +70,7 @@ export default class Experience
 
     update()
     {
+        this.meter.tick()
         this.controls.update(this.time.delta)
         this.camera.update()
         this.world.update()
