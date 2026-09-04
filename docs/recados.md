@@ -4,8 +4,9 @@ Deixar o visitante colar um post-it na parede, com o país de onde veio a
 mensagem. É a única parte do quarto em que a pessoa deixa alguma coisa, então
 vale gastar tempo antes de escrever código.
 
-Feito: o serviço em `server/recados/` e o mural dentro da cena. Falta subir
-no VPS.
+Feito: o serviço em `server/recados/`, o mural dentro da cena, e a entrada no
+compose e no Caddy do `../Hub`, em `msg.leo-abreu.com`. Falta o salt no VPS, o
+registro de DNS e apontar o build do Pages para lá.
 
 ---
 
@@ -274,6 +275,19 @@ Feito, na cena:
 
 Falta:
 
-1. subir no VPS: bloco no Caddyfile, serviço no compose, salt no `.env`
-2. apontar `VITE_RECADOS_API` para o endereço de produção no build do Pages
-3. GeoLite2 ou Cloudflare, para o país sair vazio menos vezes
+1. `RECADOS_IP_SALT` no `.env` do VPS. É o único segredo, e o serviço se recusa
+   a subir sem ele
+2. um A record para `msg.leo-abreu.com`, para o Caddy conseguir o certificado
+3. `VITE_RECADOS_API=https://msg.leo-abreu.com` como repository variable, e um
+   bloco `env:` no workflow do Pages — hoje ele não tem nenhum, que é a razão de
+   o mural não aparecer no site no ar
+4. GeoLite2, se a bandeira importar. O caminho do `CF-IPCountry` não vai
+   acontecer: o CDN está na frente do front, no Pages, e não na frente desta
+   API. Sem a base local o país volta vazio, o que nunca recusa um recado
+
+Feito, na infraestrutura:
+
+- Dockerfile: build estático em `scratch`, sem cgo, rodando como uid 65532
+- serviço, volume e rede no compose do `../Hub`, sem `ports:` como todo o resto
+- host `msg.leo-abreu.com` no Caddyfile: a parede pública num ramo, `/admin`
+  atrás do portão no outro, seguindo o `fut` em vez de dois hostnames
