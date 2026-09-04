@@ -26,7 +26,14 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
+      # The message wall's address, baked into the bundle at build time. A
+      # variable and not a secret: it ends up in JavaScript every visitor
+      # downloads, and a secret here would only hide it from the person
+      # reading this file. Unset, the wall does not appear and the room is
+      # exactly as complete as it was.
       - run: npm run build
+        env:
+          VITE_RECADOS_API: ${{ vars.VITE_RECADOS_API }}
       - uses: actions/configure-pages@v4
       - uses: actions/upload-pages-artifact@v3
         with:
