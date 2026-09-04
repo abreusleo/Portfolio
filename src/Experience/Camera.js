@@ -9,6 +9,7 @@ const _pos = new THREE.Vector3()
 const _tgt = new THREE.Vector3()
 // A camera-like dummy: cameras look down -Z, plain Object3D looks down +Z
 const _dummy = new THREE.PerspectiveCamera()
+const _up = new THREE.Vector3(0, 1, 0)
 
 /**
  * How fast the parked camera follows the pointer, per second.
@@ -62,6 +63,12 @@ export default class Camera
         this.travel = null
         this.pointer = new THREE.Vector2()
         this.parallax = new THREE.Vector2()
+        // Where the gyro is pointing, and where the camera has got to so
+        // far. In radians, applied after lookAt as a turn of the whole
+        // camera rather than as a nudge of what it aims at: parallax moves
+        // the target a few centimetres, and the door is behind you.
+        this.sweep = { yaw: 0, pitch: 0 }
+        this.sweepAt = { yaw: 0, pitch: 0 }
         this.lookTarget = new THREE.Vector3().fromArray(stations.intro.target)
         this.strength = { position: 0.13, target: 0.26 }
 
@@ -253,6 +260,21 @@ export default class Camera
         this.instance.position.lerp(_pos, follow)
         this.lookTarget.lerp(_tgt, follow)
         this.instance.lookAt(this.lookTarget)
+
+        // Scaled by the same parallax factor the stations already carry, so a
+        // station framed close on one object barely turns and the overview
+        // turns fully. A panel open on the TV should not swing away from it.
+        const sweepK = k(FOLLOW.pointer)
+        this.sweepAt.yaw += (this.sweep.yaw * this.parallaxScale - this.sweepAt.yaw) * sweepK
+        this.sweepAt.pitch += (this.sweep.pitch * this.parallaxScale - this.sweepAt.pitch) * sweepK
+
+        if (this.sweepAt.yaw || this.sweepAt.pitch)
+        {
+            // Yaw about the world's up so the horizon stays level, pitch about
+            // the camera's own right. The other order rolls the room.
+            this.instance.rotateOnWorldAxis(_up, this.sweepAt.yaw)
+            this.instance.rotateX(this.sweepAt.pitch)
+        }
     }
 
     /**

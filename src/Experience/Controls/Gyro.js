@@ -1,5 +1,6 @@
 import Experience from '../Experience.js'
 import { isMobile } from '../Utils/device.js'
+import { quality } from '../Utils/flags.js'
 
 /**
  * Look around by tilting the phone.
@@ -10,10 +11,16 @@ import { isMobile } from '../Utils/device.js'
  * and all apply here for free. A panel that pulls the camera in close already
  * damps the drift to a fifth, so reading does not shake.
  *
- * Tilt rather than compass. `alpha` is the direction the phone faces, which
- * drifts, wraps at 360 and needs calibration nobody asked for; `beta` and
- * `gamma` are how far it is leaning, which is what "lean to look" means and
- * costs none of that.
+ * Turning for the sweep, leaning for the pitch. Reaching the door behind you
+ * and the TV beside you is most of a half turn, and no amount of leaning can
+ * mean that without becoming unusably twitchy — so the yaw comes from `alpha`,
+ * which is where the phone is pointing, and turning your body turns the room
+ * by the same amount. The pitch stays on `beta`, where leaning is the gesture
+ * anybody would make.
+ *
+ * `alpha` costs what it always costs: it wraps at 360, so the difference from
+ * the neutral is taken the short way round, and it drifts over minutes, which
+ * a room nobody stands in for minutes can afford.
  *
  * The neutral is wherever the phone was when permission landed, not zero.
  * People hold a phone at about forty degrees, and a version measuring from
@@ -21,10 +28,13 @@ import { isMobile } from '../Utils/device.js'
  */
 const NEUTRAL_SAMPLES = 6
 
-/** How far to lean, in degrees, to reach the edge of the look. */
-const RANGE = { yaw: 24, pitch: 16 }
+/** How far to lean, in degrees, before the pitch is at its limit. */
+const PITCH_RANGE = 26
 
-const clamp = (value) => Math.max(-1, Math.min(1, value))
+/** Where the pitch tops out, so nobody ends up looking at the ceiling. */
+const PITCH_LIMIT = 22
+
+const DEG = Math.PI / 180
 
 export default class Gyro
 {
@@ -76,8 +86,8 @@ export default class Gyro
 
     read(event)
     {
-        const { beta, gamma } = event
-        if (beta === null || gamma === null) return
+        const { alpha, beta } = event
+        if (alpha === null || beta === null) return
 
         // A phone flat on a table reports nothing useful and a phone being
         // picked up reports the journey, so the rest position is averaged over
@@ -86,14 +96,24 @@ export default class Gyro
         {
             this.samples++
             this.neutral = this.neutral
-                ? { beta: (this.neutral.beta + beta) / 2, gamma: (this.neutral.gamma + gamma) / 2 }
-                : { beta, gamma }
+                ? { alpha: this.turn(alpha, this.neutral.alpha) / 2 + this.neutral.alpha,
+                    beta: (this.neutral.beta + beta) / 2 }
+                : { alpha, beta }
             return
         }
 
-        this.camera.pointer.set(
-            clamp((gamma - this.neutral.gamma) / RANGE.yaw),
-            clamp(-(beta - this.neutral.beta) / RANGE.pitch),
-        )
+        const range = quality.gyroRange
+        const turned = Math.max(-range, Math.min(range, this.turn(alpha, this.neutral.alpha)))
+        const leaned = Math.max(-PITCH_LIMIT, Math.min(PITCH_LIMIT,
+            -(beta - this.neutral.beta) * (PITCH_LIMIT / PITCH_RANGE)))
+
+        this.camera.sweep.yaw = turned * DEG * (quality.gyroFlip ? -1 : 1)
+        this.camera.sweep.pitch = leaned * DEG
+    }
+
+    /** Degrees from `to` to `from`, the short way round the circle. */
+    turn(from, to)
+    {
+        return ((from - to + 540) % 360) - 180
     }
 }

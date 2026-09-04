@@ -48,5 +48,18 @@ export const quality = {
     samples: number('msaa', null),
     bloom: flag('bloom', true),
     fovCap: number('fovcap', null),
+    // How far the sweep may turn, in degrees, and which way.
+    //
+    // Sixty because that is what the room measures: sweeping the overview
+    // station brings the TV into frame between 25 and 50 degrees one way and
+    // the door with the notes between 25 and 50 the other, and past eighty
+    // there is nothing to look at. A wider limit only lets somebody turn to
+    // face a blank wall and wonder where the room went.
+    //
+    // The direction is a switch and not a guess: the sign of `alpha` is not
+    // something this machine can check, because Chromium accepts the
+    // orientation override and then reports nulls.
+    gyroRange: number('gyrorange', 60),
+    gyroFlip: params.has('gyroflip'),
     blur: flag('blur', true),
 }
