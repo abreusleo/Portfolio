@@ -70,11 +70,11 @@ export const strings = {
     deskIntro: {
         pt: [
             'Esses são mais alguns dos meus interesses.',
-            'Clique nos ícones à esquerda: o que eu jogo, o que eu assisto e o que eu ouço.',
+            'Clique nos ícones: o que eu jogo, o que eu assisto e o que eu ouço.',
         ],
         en: [
             'A few more of the things I am into.',
-            'Click the icons on the left: what I play, what I watch and what I listen to.',
+            'Click the icons: what I play, what I watch and what I listen to.',
         ],
     },
     deskFilm: { pt: 'filme', en: 'film' },
