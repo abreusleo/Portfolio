@@ -817,9 +817,19 @@ export default class Interactions
 
     canInteract()
     {
+        // A detail on screen holds the room still: the panel is what the
+        // visitor is reading, and a scene that answered clicks underneath it
+        // would swap the text out from under them.
+        //
+        // Folded is the exception, and it is the visitor's own statement. They
+        // pressed the button that puts the reading away to look at the room —
+        // handing them a room they still cannot touch answers the wrong half.
+        // Only reachable on a phone; the fold has no button anywhere else.
+        const reading = this.detailOpen && !this.panel.folded
+
         return this.enabled
             && !this.controls.active
-            && !this.detailOpen
+            && !reading
             && !this.videoOpen
             && !this.desktopOpen
             && !this.composeOpen
