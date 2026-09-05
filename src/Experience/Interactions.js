@@ -931,6 +931,12 @@ class InfoPanel
     {
         this.root = document.getElementById('panel')
         this.eyebrow = document.getElementById('panel-eyebrow')
+        this.foldButton = document.getElementById('panel-fold')
+
+        // Remembered for the visit rather than reset on every open. Somebody
+        // who folded the text away did it to look at the room, and unfolding
+        // it for them on the next print is the room deciding it knows better.
+        this.folded = false
         this.title = document.getElementById('panel-title')
         this.body = document.getElementById('panel-body')
         this.meta = document.getElementById('panel-meta')
@@ -955,6 +961,7 @@ class InfoPanel
         this.nextButton.addEventListener('click', () => this.onNext && this.onNext())
 
         this.closeButton.addEventListener('click', () => this.onClose())
+        this.foldButton?.addEventListener('click', () => this.fold(!this.folded))
         this.backButton.addEventListener('click', () =>
         {
             if (this.onBack) this.onBack()
@@ -1045,7 +1052,22 @@ class InfoPanel
         this.backButton.classList.toggle('hidden', !onBack)
         this.root.classList.remove('hidden')
         this.root.setAttribute('aria-hidden', 'false')
+        this.fold(this.folded)
         this.closeButton.focus()
+    }
+
+    /**
+     * Hides the reading and keeps everything needed to leave or step onward.
+     *
+     * On a phone the panel is a sheet across the bottom, and the camera has
+     * just moved to frame the thing it describes — which is then behind the
+     * sheet. The 3D stops meaning anything at the moment it means most.
+     */
+    fold(folded)
+    {
+        this.folded = folded
+        this.root.classList.toggle('folded', folded)
+        this.foldButton?.setAttribute('aria-expanded', String(!folded))
     }
 
     /** Redraws in the current language, if there is anything on screen. */

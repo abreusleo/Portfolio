@@ -1766,3 +1766,71 @@ body.no-blur #compose
 
 /* No rule needed to hide them with the loader: they sit inside #hud, which
    already carries that. */
+
+/* ---------------------------------------------------------------------------
+   Folding the panel away
+
+   On a phone the panel is a sheet across the bottom, and the camera has just
+   moved to frame the thing it describes — which is then behind the sheet. The
+   3D stops meaning anything at the moment it is most relevant.
+
+   Folded keeps the eyebrow, the title, the step arrows and the buttons: enough
+   to know what is open, to walk to the next one, and to get out. Only the
+   reading goes. --------------------------------------------------------- */
+.panel-fold { display: none; }
+
+@media (max-width: 720px)
+{
+    .panel-fold
+    {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        margin-left: auto;
+        background: none;
+        border: 1px solid rgba(233, 231, 227, 0.2);
+        color: var(--fg);
+        font-family: var(--font);
+        font-size: 0.9rem;
+        line-height: 1;
+        cursor: pointer;
+        transition: transform 0.25s ease, border-color 0.2s ease;
+    }
+    .panel-fold:active { border-color: var(--accent); color: var(--accent); }
+
+    /* Points the way it will move: down to fold, up to unfold. */
+    #panel.folded .panel-fold { transform: rotate(180deg); }
+
+    #panel.folded .panel-body,
+    #panel.folded .panel-list,
+    #panel.folded .panel-meta { display: none; }
+
+    #panel.folded .panel-title
+    {
+        font-size: 1.05rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    #panel.folded .panel-inner { gap: 0.55rem; }
+
+    /*
+     * Folding the text away is only half of it. The panel is a full-screen
+     * element carrying the gradient that dims the room, and it swallows every
+     * touch that lands on it — so a folded panel left the scene dark and
+     * untouchable, which is the complaint it was built to answer.
+     *
+     * The card keeps its own background and its own touches; everything
+     * around it stops existing.
+     */
+    #panel.folded
+    {
+        background: none;
+        pointer-events: none;
+    }
+
+    #panel.folded .panel-inner { pointer-events: auto; }
+}

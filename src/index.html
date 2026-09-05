@@ -97,6 +97,11 @@
                     <span class="panel-count" id="panel-count"></span>
                     <button id="panel-next" class="panel-arrow" aria-label="Próximo">&rsaquo;</button>
                 </div>
+                <!-- Folds the reading away so the room is visible behind it.
+                     Phone only: on a desktop the panel is a column beside the
+                     scene and never covers it. -->
+                <button id="panel-fold" class="panel-fold" type="button" data-mobile
+                        aria-expanded="true" aria-controls="panel-body" aria-label="Recolher o texto">&or;</button>
             </div>
             <h2 class="panel-title" id="panel-title"></h2>
             <div class="panel-body" id="panel-body"></div>
