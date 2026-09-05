@@ -150,6 +150,11 @@ export default class Interactions
 
         this.canvas.addEventListener('pointerdown', (e) =>
         {
+            // A finger has no hover, so a label that follows the pointer has
+            // nothing to follow and nothing to dismiss it: it lands on the
+            // first tap and stays where that tap was for the rest of the
+            // visit. The cursor it was written for does not exist here.
+            this.touching = e.pointerType !== 'mouse'
             this.downAt = { x: e.clientX, y: e.clientY }
             if (!this.placing) return
 
@@ -866,8 +871,8 @@ export default class Interactions
             {
                 this.hoveredNote = mesh && mesh !== reading ? mesh : null
                 const note = this.hoveredNote?.userData.note ?? null
-                this.tooltip.textContent = note ? (note.name || t(strings.readNote)) : ''
-                this.tooltip.classList.toggle('hidden', !note)
+                this.tooltip.textContent = note && !this.touching ? (note.name || t(strings.readNote)) : ''
+                this.tooltip.classList.toggle('hidden', !note || this.touching)
             }
 
             if (this.hoveredNote)
@@ -918,8 +923,8 @@ export default class Interactions
         if (hotspot !== this.hovered)
         {
             this.hovered = hotspot
-            this.tooltip.textContent = hotspot ? t(hotspot.label) : ''
-            this.tooltip.classList.toggle('hidden', !hotspot)
+            this.tooltip.textContent = hotspot && !this.touching ? t(hotspot.label) : ''
+            this.tooltip.classList.toggle('hidden', !hotspot || this.touching)
         }
 
         if (this.hovered) this.moveTooltip()

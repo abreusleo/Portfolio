@@ -2,7 +2,12 @@ import projects from './projects.js'
 import products from './products.js'
 
 /**
- * Text shown in the side panel. Keys match the hotspot ids in Interactions.js.
+ * Text shown in the side panel.
+ *
+ * No line here tells the visitor to click or tap anything. A list of six
+ * projects announces what it is by being a list, the cursor says the rest on a
+ * desktop, and on a phone the word "clique" describes a gesture that does not
+ * exist there — while costing two of the few lines the sheet has. Keys match the hotspot ids in Interactions.js.
  * The six print entries are generated from config/projects.js, so the wall and
  * the copy always describe the same thing.
  *
@@ -16,11 +21,9 @@ const content = {
         body: {
             pt: [
                 'Duas coisas que existem fora do servidor pessoal: um SaaS hospitalar e um jogo em construção.',
-                'Clique para ver o detalhe.',
             ],
             en: [
                 'Two things that exist outside the personal server: a hospital SaaS and a game being built.',
-                'Click for the detail.',
             ],
         },
         meta: [
@@ -35,11 +38,9 @@ const content = {
         body: {
             pt: [
                 'Seis aplicações rodando no mesmo servidor. O Hub é a porta de entrada e os outros cinco vivem atrás dele, sem login próprio.',
-                'Clique para ver o projeto.',
             ],
             en: [
                 'Six applications on one server. Hub is the front door and the other five live behind it, with no login of their own.',
-                'Click to see the project.',
             ],
         },
         meta: [
@@ -49,24 +50,23 @@ const content = {
         ],
     },
 
+    // The quote and what it meant, and nothing else. An explanation of a line
+    // that good is the one thing that can weaken it; that it stayed on a
+    // screen for four years says more than a paragraph about why.
     board: {
         eyebrow: { pt: 'Frase', en: 'Quote' },
-        kicker: { pt: 'Sobre ideias que pareciam loucas', en: 'On ideas that looked mad' },
         title: 'Arsène Wenger',
         body: {
             pt: [
                 '"The biggest things in life have been achieved by people who, at the start, we would have judged crazy. And yet if they had not had these crazy ideas the world would have been more stupid."',
-                'Wenger falava de futebol, mas a frase não é sobre futebol. É sobre a distância entre parecer maluco no começo e parecer óbvio no fim.',
+                'Essa frase foi meu wallpaper por 4 anos.',
             ],
             en: [
                 '"The biggest things in life have been achieved by people who, at the start, we would have judged crazy. And yet if they had not had these crazy ideas the world would have been more stupid."',
-                'Wenger was talking about football, but the line is not about football. It is about the distance between looking mad at the start and looking obvious at the end.',
+                'This line was my wallpaper for four years.',
             ],
         },
-        meta: [
-            [{ pt: 'Autor', en: 'Author' }, 'Arsène Wenger'],
-            [{ pt: 'Clube', en: 'Club' }, 'Arsenal'],
-        ],
+        meta: [],
     },
 
     notes: {

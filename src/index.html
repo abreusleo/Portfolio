@@ -104,9 +104,14 @@
                         aria-expanded="true" aria-controls="panel-body" aria-label="Recolher o texto">&or;</button>
             </div>
             <h2 class="panel-title" id="panel-title"></h2>
-            <div class="panel-body" id="panel-body"></div>
-            <div class="panel-list hidden" id="panel-list"></div>
-            <dl class="panel-meta" id="panel-meta"></dl>
+            <!-- The only part that scrolls. What moves you between things —
+                 the title, the step arrows, the buttons — stays put, so a long
+                 entry cannot carry the way out off the top of the screen. -->
+            <div class="panel-scroll">
+                <div class="panel-body" id="panel-body"></div>
+                <div class="panel-list hidden" id="panel-list"></div>
+                <dl class="panel-meta" id="panel-meta"></dl>
+            </div>
             <div class="panel-actions">
                 <button id="panel-action" class="btn small accent hidden"></button>
                 <button id="panel-back" class="btn small ghost hidden" data-i18n="back">VOLTAR</button>

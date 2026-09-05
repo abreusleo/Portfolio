@@ -1848,3 +1848,46 @@ body.no-blur #compose
 
     #panel.folded .panel-inner { pointer-events: auto; }
 }
+
+/* ---------------------------------------------------------------------------
+   Reading scrolls, navigating does not
+
+   A six-item list filled the sheet and carried its own head off the top: the
+   title, the step arrows and the fold button all scrolled away, which left the
+   visitor inside a list with no visible way out of it. The controls that move
+   you between things now stay put and only the reading moves under them.
+
+   And the sheet stops at 72% of the screen, so a strip of room is always
+   there. A panel that can take the whole display is a panel that can make the
+   3D pointless, which is the thing the fold was already fighting.
+   --------------------------------------------------------------------------- */
+.panel-scroll { display: contents; }
+
+@media (max-width: 720px)
+{
+    .panel-inner
+    {
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100vh - 1.5rem);
+        max-height: min(72dvh, calc(100dvh - 1.5rem));
+    }
+
+    .panel-scroll
+    {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        min-height: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        /* Says there is more under the fold without drawing a scrollbar. */
+        mask-image: linear-gradient(to bottom, #000 calc(100% - 1.5rem), transparent);
+    }
+
+    .panel-top,
+    .panel-title,
+    .panel-actions { flex: none; }
+
+    #panel.folded .panel-scroll { display: none; }
+}
