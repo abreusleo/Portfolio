@@ -157,7 +157,9 @@ export default class World extends EventEmitter
         // is already at a hundred by this point, so the step label is what
         // says the wait is real.
         this.trigger('step', { pt: 'shaders', en: 'shaders' })
+        this.trigger('finishing', 0)
         await this.experience.renderer.prewarm()
+        this.trigger('finishing', 0.4)
 
         // The shadow maps are frozen by design; this is the one pass that
         // draws them, with the models in.
@@ -174,7 +176,8 @@ export default class World extends EventEmitter
         this.experience.renderer.world = this
 
         this.trigger('step', { pt: 'ajustando', en: 'tuning' })
-        await this.experience.quality.calibrate()
+        await this.experience.quality.calibrate((done) => this.trigger('finishing', 0.4 + done * 0.6))
+        this.trigger('finishing', 1)
 
         this.trigger('dressed')
     }

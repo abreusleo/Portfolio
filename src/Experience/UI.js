@@ -7,7 +7,16 @@ import Views from './Views.js'
 import { locale, strings, t } from './config/i18n.js'
 
 const BAR_CELLS = 34
-const BUILD_WEIGHT = 0.3
+/**
+ * What each phase is worth on the counter.
+ *
+ * The last one exists because the counter used to reach a hundred and then sit
+ * there: downloading and building both report, and the two jobs after them —
+ * compiling every shader, then measuring the frame to pick a quality — did
+ * not. A bar at a hundred with a button that will not answer reads as broken,
+ * and reads worse the more honest work is happening behind it.
+ */
+const WEIGHT = { downloaded: 0.6, built: 0.25, finishing: 0.15 }
 
 /**
  * Marks a tab that has already been through the gate.
@@ -59,6 +68,7 @@ export default class UI
         // frames, downloading the models is megabytes.
         this.built = 0
         this.downloaded = 0
+        this.finishing = 0
 
         this.shotMode = new URLSearchParams(window.location.search).has('shot')
         if (this.shotMode) this.hud.classList.add('hidden')
@@ -98,6 +108,7 @@ export default class UI
         })
 
         this.world.on('progress', (value) => { this.built = value })
+        this.world.on('finishing', (value) => { this.finishing = value })
         this.resources.on('progress', (value) => { this.downloaded = value })
 
         this.world.on('dressed', () => this.onSceneReady())
@@ -116,13 +127,16 @@ export default class UI
     {
         this.built = 1
         this.downloaded = 1
+        this.finishing = 1
         this.sceneReady = true
         if (this.shotMode || this.returning) this.enter(true)
     }
 
     get target()
     {
-        return this.built * BUILD_WEIGHT + this.downloaded * (1 - BUILD_WEIGHT)
+        return this.built * WEIGHT.built
+            + this.downloaded * WEIGHT.downloaded
+            + this.finishing * WEIGHT.finishing
     }
 
     renderBar(ratio)
@@ -306,10 +320,6 @@ export default class UI
         if (this.entered) return
         this.entered = true
         this.remember()
-
-        // Asked from this tap because iOS grants it only from a gesture.
-        // Denied, dismissed or unsupported all continue below unchanged.
-        this.experience.gyro?.request().catch(() => {})
 
         this.loader.classList.add('hidden')
         if (!this.shotMode) this.hud.classList.remove('hidden')

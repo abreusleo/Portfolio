@@ -4,14 +4,13 @@ import { VIEWS } from './Camera.js'
 /**
  * Two arrows, three ways to face the room.
  *
- * The gyro turns the room by turning the phone, which is the better gesture
- * when it works and is worth nothing when the visitor declines the permission,
- * holds the phone flat, or is on a device that reports the turn backwards.
- * This is the same three positions with a thumb: predictable, no permission,
- * no sensor, and the same angles — VIEWS is where both read them.
+ * There was a gyro here, turning the room by turning the phone. It went
+ * because this is better at the same job: a thumb needs no permission prompt
+ * before the room, works with the phone flat on a desk, and points the way it
+ * is pressed on every device — which the turn sensor did not, twice.
  *
- * It sets the target and lets the camera's own smoothing carry it, so the
- * arrows and the gyro move the room by exactly the same path.
+ * It sets the target and lets the camera's own smoothing carry it, so this
+ * moves the room by the same path a window resize does.
  */
 export default class Views
 {
@@ -44,12 +43,7 @@ export default class Views
 
     apply()
     {
-        const yaw = VIEWS[this.at].yaw
-        this.camera.sweep.yaw = yaw * Math.PI / 180
-
-        // The gyro writes the same angle every reading. Without this the view
-        // just chosen would be gone before the next frame drew it.
-        this.experience.gyro?.anchorTo(yaw)
+        this.camera.sweep.yaw = VIEWS[this.at].yaw * Math.PI / 180
 
         // Disabled rather than hidden at the ends: an arrow that vanishes
         // moves the other one under the thumb that was reaching for it.

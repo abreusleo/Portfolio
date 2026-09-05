@@ -18,9 +18,8 @@ const _up = new THREE.Vector3(0, 1, 0)
  * on screen puts the door with the notes dead centre at +40 and the TV at -35.
  * Zero is how the station was framed, which is the desk and the wall of prints.
  *
- * They are not symmetrical because the room is not, and they are the ends for
- * everything that sweeps — the arrows step between them, the gyro is clamped
- * to the outer two, so neither can reach a wall with nothing on it.
+ * They are not symmetrical because the room is not, and the outer two are
+ * the ends of the sweep, so no arrow can face a wall with nothing on it.
  */
 export const VIEWS = [
     { id: 'door', yaw: 40 },
@@ -80,10 +79,10 @@ export default class Camera
         this.travel = null
         this.pointer = new THREE.Vector2()
         this.parallax = new THREE.Vector2()
-        // Where the gyro is pointing, and where the camera has got to so
-        // far, in radians. Applied after lookAt as a turn of the whole camera
-        // rather than as a nudge of what it aims at: parallax moves the target
-        // a few centimetres, and the door is behind you.
+        // Which way the room is being faced, and how far the camera has got
+        // towards it, in radians. Applied after lookAt as a turn of the whole
+        // camera rather than as a nudge of what it aims at: parallax moves the
+        // target a few centimetres, and the door is behind you.
         //
         // Yaw only. A room seen from a seat is a horizontal thing — the floor
         // and the ceiling hold nothing worth turning towards, and an axis that
@@ -115,10 +114,6 @@ export default class Camera
 
         window.addEventListener('touchmove', (e) =>
         {
-            // The gyro writes the same pointer, and a finger dragged across
-            // the glass while the phone is being tilted is two hands on one
-            // wheel.
-            if (this.gyro?.active) return
             if (this.mode !== 'overview') return
             const t = e.touches[0]
             this.pointer.set(

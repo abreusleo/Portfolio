@@ -101,9 +101,9 @@ export default class Quality
      * know what this scene costs on hardware it has never seen, which is the
      * same guess in a different hat.
      */
-    async calibrate()
+    async calibrate(onProgress = () => {})
     {
-        if (!this.auto) return
+        if (!this.auto) return onProgress(1)
 
         const remembered = this.read()
         if (remembered !== null)
@@ -112,12 +112,13 @@ export default class Quality
             // spends a second and reaches the same rung.
             this.at = remembered
             this.apply()
-            return
+            return onProgress(1)
         }
 
         for (this.at = 0; this.at < TIERS.length; this.at++)
         {
             this.apply()
+            onProgress(this.at / TIERS.length)
             const median = await this.measure(SAMPLES)
             if (median <= BUDGET) break
         }

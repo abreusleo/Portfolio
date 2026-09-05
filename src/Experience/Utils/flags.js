@@ -51,10 +51,5 @@ export const quality = {
     samples: number('msaa', null),
     bloom: flag('bloom', true),
     fovCap: number('fovcap', null),
-    // Which way round the turn runs. Reported inverted on a real phone, so
-    // the default is now the other way and this switch returns the first
-    // reading — the sign of `alpha` is not something this machine can check,
-    // since Chromium accepts the orientation override and then reports nulls.
-    gyroFlipped: params.has('gyroflip'),
     blur: flag('blur', true),
 }
