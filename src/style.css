@@ -24,11 +24,25 @@ body
     -webkit-font-smoothing: antialiased;
 }
 
+/*
+ * The size here is what the visitor sees; the renderer only decides how many
+ * pixels go into it, and is told not to write its own.
+ *
+ * Both halves are load-bearing. A canvas is a replaced element, so `inset: 0`
+ * alone leaves it at the intrinsic size of its buffer — twice the screen on a
+ * phone at ratio two. And dvh rather than vh because vh is the viewport with
+ * the address bar pretended away: sized in vh, the canvas comes up short by
+ * exactly the height of that bar the moment it slides back in, and the strip
+ * underneath is the body showing through.
+ */
 .webgl
 {
     position: fixed;
     inset: 0;
     display: block;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
     outline: none;
 }
 

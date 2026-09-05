@@ -185,7 +185,18 @@ export default class Renderer
             antialias: false, // MSAA happens on the composer target
             powerPreference: 'high-performance',
         })
-        this.instance.setSize(this.sizes.width, this.sizes.height)
+        // The third argument is what stops it writing width and height onto
+        // the canvas as inline pixels. Inline beats the stylesheet, so doing
+        // that hands the visible size of the canvas to whatever Sizes last
+        // measured — and a phone hiding its address bar grows the viewport
+        // without always telling us in time. The canvas was then genuinely
+        // shorter than the screen, and the strip underneath it was the body
+        // showing through: the black band at the bottom.
+        //
+        // Now `inset: 0` in the stylesheet owns what is covered and this owns
+        // only how many pixels are drawn into it. A measurement that arrives
+        // late costs a frame at a slightly wrong resolution instead.
+        this.instance.setSize(this.sizes.width, this.sizes.height, false)
         this.instance.setPixelRatio(this.sizes.pixelRatio)
         this.instance.shadowMap.enabled = true
         this.instance.shadowMap.type = THREE.PCFSoftShadowMap
@@ -306,7 +317,7 @@ export default class Renderer
 
     resize()
     {
-        this.instance.setSize(this.sizes.width, this.sizes.height)
+        this.instance.setSize(this.sizes.width, this.sizes.height, false)
         this.instance.setPixelRatio(this.sizes.pixelRatio)
         this.composer.setPixelRatio(this.sizes.pixelRatio)
         this.composer.setSize(this.sizes.width, this.sizes.height)
