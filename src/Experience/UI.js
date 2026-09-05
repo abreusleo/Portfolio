@@ -154,7 +154,9 @@ export default class UI
             if (this.camera.mode === 'overview') this.controls.enable()
         })
 
-        this.exploreButton.addEventListener('click', () =>
+        // Removed from the phone for now; free flight is still F on a
+        // keyboard, and this survives the button not being there.
+        this.exploreButton?.addEventListener('click', () =>
         {
             if (this.controls.active) this.controls.disable()
             else if (this.camera.mode === 'overview') this.controls.enable()
@@ -307,7 +309,7 @@ export default class UI
         if (this.step && this.logEl && !this.logEl.dataset.i18n) this.logEl.textContent = t(this.step)
         if (this.eggsEl) this.eggsEl.title = this.eggsTitle(this.eggsFound ?? 0)
         if (this.hint) this.hint.textContent = t(this.flying ? strings.hintFly : strings.hintIdle)
-        this.exploreButton.textContent = t(this.flying ? strings.exploreBack : strings.explore)
+        if (this.exploreButton) this.exploreButton.textContent = t(this.flying ? strings.exploreBack : strings.explore)
 
         for (const button of this.langButtons ?? [])
         {

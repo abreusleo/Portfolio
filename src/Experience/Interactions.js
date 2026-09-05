@@ -1052,8 +1052,10 @@ class InfoPanel
                 const button = document.createElement('button')
                 button.type = 'button'
                 button.className = 'panel-pick'
+                // No number. Numbering says sequence, and these six are a
+                // set: Hub does not come before Orb, it is just the one you
+                // arrive through. The name carries the weight instead.
                 button.innerHTML = `
-                    <span class="pick-index">${String(index + 1).padStart(2, '0')}</span>
                     <span class="pick-title"></span>
                     <span class="pick-note"></span>
                 `
