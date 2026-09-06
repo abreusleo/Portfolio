@@ -105,6 +105,11 @@ export const strings = {
     laptopRole: { pt: 'SOFTWARE ENGINEER BACKEND', en: 'BACKEND SOFTWARE ENGINEER' },
     laptopDomain: { pt: 'core banking e cartões', en: 'core banking and cards' },
 
+    // The first walk through the room
+    tourNext: { pt: 'SEGUIR', en: 'NEXT' },
+    tourSkip: { pt: 'PULAR', en: 'SKIP' },
+    tourDone: { pt: 'COMEÇAR', en: 'START' },
+
     // The menu
     menuOpen: { pt: 'IR PARA', en: 'GO TO' },
     menuTitle: { pt: 'Lugares da sala', en: 'Places in the room' },

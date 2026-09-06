@@ -4,6 +4,7 @@ import { isTyping } from './Utils/typing.js'
 import { quality } from './Utils/flags.js'
 import Menu from './Menu.js'
 import Views from './Views.js'
+import Tour from './Tour.js'
 import { locale, strings, t } from './config/i18n.js'
 
 const BAR_CELLS = 34
@@ -84,6 +85,7 @@ export default class UI
         // those when the world finishes, which is after all of this.
         this.menu = new Menu()
         this.views = new Views()
+        this.tour = new Tour()
 
         // The eggs are built as one of the world's steps, so they do not exist
         // yet when this runs.
@@ -325,7 +327,12 @@ export default class UI
 
         this.loader.classList.add('hidden')
         if (!this.shotMode) this.hud.classList.remove('hidden')
-        this.camera.enter(instant ? 0 : 2.8)
+        this.camera.enter(instant ? 0 : 2.8).then(() =>
+        {
+            // After the arrival, not during it: a bar appearing over a camera
+            // still moving reads as part of the loading rather than as an offer.
+            if (!instant) this.tour?.start()
+        })
         this.experience.renderer.reveal(instant ? 0 : 2.6)
     }
 

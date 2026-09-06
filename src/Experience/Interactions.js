@@ -445,6 +445,10 @@ export default class Interactions
     {
         if (!hotspot) return
 
+        // Somebody who has started opening things does not need to be
+        // walked anywhere.
+        this.experience.ui?.tour?.stop()
+
         if (hotspot.kind === 'compose') this.openCompose()
         else if (hotspot.kind === 'video') this.openVideo()
         else if (hotspot.kind === 'desktop') this.openDesktop()

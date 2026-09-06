@@ -72,6 +72,19 @@
         <div class="hud-br"></div>
     </div>
 
+    <!-- The first walk through the room. Names each place; opens nothing. -->
+    <div id="tour" class="hidden" aria-hidden="true" aria-live="polite">
+        <p class="tour-where">
+            <span class="tour-eyebrow" id="tour-eyebrow"></span>
+            <span class="tour-title" id="tour-title"></span>
+        </p>
+        <div class="tour-controls">
+            <span class="tour-step" id="tour-step"></span>
+            <button id="tour-skip" class="btn small ghost" type="button" data-i18n="tourSkip">PULAR</button>
+            <button id="tour-next" class="btn small accent" type="button" data-i18n="tourNext">SEGUIR</button>
+        </div>
+    </div>
+
     <!-- Every place in the room, as a list. Built from the same hotspots the
          scene registers, so the two cannot list different things. -->
     <nav id="menu" class="hidden" aria-hidden="true" aria-label="Lugares da sala">

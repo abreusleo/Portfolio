@@ -197,6 +197,20 @@ body
     background: var(--accent);
 }
 
+/*
+ * .btn:hover fills with the accent and .btn.accent writes in it, so together
+ * they were the accent on the accent: a button with no readable label, on
+ * hover and on the sticky focus a tap leaves behind. It was worst on the one
+ * that invites somebody to write on the wall.
+ *
+ * The fill wins, and the label goes dark like every other button's does.
+ */
+.btn.accent:hover:not(:disabled),
+.btn.accent:focus-visible:not(:disabled)
+{
+    color: var(--bg);
+}
+
 .btn:active:not(:disabled)
 {
     transform: translateY(1px);
@@ -1882,4 +1896,75 @@ body.no-blur #compose
     .panel-actions { flex: none; }
 
     #panel.folded .panel-scroll { display: none; }
+}
+
+/* ---------------------------------------------------------------------------
+   The first walk
+
+   A bar, not an overlay. The room is what the visitor came for and what the
+   walk is about, so nothing dims it and nothing points at it with a bubble:
+   the camera goes to the place and this says which place it is.
+   --------------------------------------------------------------------------- */
+#tour
+{
+    position: fixed;
+    left: 50%;
+    bottom: 1.4rem;
+    transform: translateX(-50%);
+    z-index: 26;
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+    width: min(30rem, calc(100% - 2rem));
+    padding: 0.85rem 1rem 0.85rem 1.15rem;
+    background: rgba(9, 10, 12, 0.9);
+    border: 1px solid rgba(233, 231, 227, 0.16);
+    transition: opacity 0.4s ease, visibility 0s linear 0.4s;
+}
+#tour:not(.hidden) { transition-delay: 0s; }
+
+.tour-where
+{
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+    flex: 1;
+}
+.tour-eyebrow
+{
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+.tour-title
+{
+    font-size: 0.95rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tour-controls
+{
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: none;
+}
+.tour-step
+{
+    font-size: 0.66rem;
+    color: var(--dim);
+    font-variant-numeric: tabular-nums;
+}
+#tour-skip[hidden] { display: none; }
+
+@media (max-width: 720px)
+{
+    /* Above the view arrows, which sit at 74%. */
+    #tour { bottom: 1rem; gap: 0.8rem; padding: 0.75rem 0.8rem; }
+    .tour-title { font-size: 0.85rem; }
 }
