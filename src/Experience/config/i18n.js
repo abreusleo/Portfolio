@@ -60,6 +60,7 @@ export const strings = {
     composePlaceholder: { pt: 'escreva aqui…', en: 'write here…' },
     composeNamePlaceholder: { pt: 'seu nome (opcional)', en: 'your name (optional)' },
     readNote: { pt: 'ler o recado', en: 'read the note' },
+    unsigned: { pt: 'sem assinatura', en: 'unsigned' },
 
     // The machine's desktop
     deskGames: { pt: 'jogos favoritos', en: 'favourite games' },

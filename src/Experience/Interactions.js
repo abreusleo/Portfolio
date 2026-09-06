@@ -8,6 +8,7 @@ import { emblemSvg } from './config/emblems.js'
 import { locale, strings, t } from './config/i18n.js'
 import { api, enabled as notesEnabled, MAX_LENGTH, wall } from './config/notes.js'
 import { isTyping } from './Utils/typing.js'
+import { isMobile } from './Utils/device.js'
 import Desktop from './Desktop.js'
 
 /**
@@ -645,6 +646,40 @@ export default class Interactions
         this.camera.goTo(this.stationFor(mesh, { distance: 0.34, fov: 34, side: 0, parallax: 0.04 }), 1)
     }
 
+    /**
+     * The door, as a list.
+     *
+     * Every note is a small piece of paper at an angle, which is a fine thing
+     * to lean into and a poor thing to aim a finger at. The wall's own panel
+     * already knows how to show a set of things worth opening, so it shows
+     * this one: a name to press instead of a square centimetre of paper.
+     */
+    noteItems()
+    {
+        return (this.world.notes?.meshes ?? []).map((mesh) =>
+        {
+            const note = mesh.userData.note
+            return {
+                id: note.id,
+                title: note.name?.trim() || t(strings.unsigned),
+                note: note.text,
+            }
+        })
+    }
+
+    pickNote(id)
+    {
+        const mesh = (this.world.notes?.meshes ?? []).find((m) => m.userData.note?.id === id)
+        if (!mesh) return
+
+        // The camera leans in until the paper fills the frame, and on a phone
+        // the sheet is over most of that frame. Folding is what the visitor
+        // would do next anyway, and the header it leaves behind is how they
+        // come back to the list for the following one.
+        if (isMobile) this.panel.fold(true)
+        this.openNote(mesh)
+    }
+
     /** Back out to the whole door. */
     closeNote(duration = 1.1)
     {
@@ -766,6 +801,10 @@ export default class Interactions
         {
             if (!this.detailOpen) return
             this.panel.open(id, {
+                // An empty array still draws a list, and an empty list on a
+                // door nobody has written on yet is a box saying nothing.
+                items: id === 'notes' ? (this.noteItems().length ? this.noteItems() : null) : null,
+                onPick: id === 'notes' ? (noteId) => this.pickNote(noteId) : null,
                 onAction: id === 'notes' && notesEnabled ? () => this.openCompose() : null,
                 actionLabel: strings.writeNote,
                 onBack: group ? () => this.openGroup(group) : null,
