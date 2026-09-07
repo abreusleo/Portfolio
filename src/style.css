@@ -170,6 +170,93 @@ body
     color: var(--accent);
 }
 
+/* ------------------------------------------------------------------ */
+/* The card over the way in                                            */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Bottom left, over the floor, which is the emptiest part of every framing the
+ * arrival passes through — measured, not assumed: the move was put on screen
+ * at both shapes and this is the band nothing walks into.
+ *
+ * It never takes a pointer. The whole frame is the skip, and a card that
+ * swallowed the tap meant for the room would make the one promise it prints
+ * the one thing it breaks.
+ */
+.opening
+{
+    position: fixed;
+    left: clamp(1.4rem, 5vw, 5rem);
+    bottom: clamp(2.4rem, 9vh, 6rem);
+    z-index: 40;
+    pointer-events: none;
+    max-width: min(72ch, 88vw);
+    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.85);
+}
+
+.opening.hidden { display: none; }
+
+.opening-name
+{
+    font-size: clamp(1.28rem, 4.2vw, 2.9rem);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1.05;
+    color: var(--fg);
+}
+
+.opening-role
+{
+    margin-top: 0.5rem;
+    font-size: clamp(0.62rem, 1.5vw, 0.8rem);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+.opening-line
+{
+    /* Its own measure. The block is wide enough for the name to hold one
+       line on a desktop, and a sentence set to that width is a bad read. */
+    max-width: 34ch;
+    margin-top: 1rem;
+    font-size: clamp(0.82rem, 1.9vw, 1.05rem);
+    line-height: 1.5;
+    color: var(--fg);
+    opacity: 0.82;
+}
+
+.opening-skip
+{
+    margin-top: 1.6rem;
+    font-size: 0.66rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dim);
+}
+
+.opening-skip::before
+{
+    content: '// ';
+    color: var(--accent);
+}
+
+/* The room's own hint sits in the same corner. Two lines of instruction under
+   one another is one more than anybody reads. */
+body.opening-running #hint { opacity: 0; }
+
+/*
+ * And the view arrows go quiet. They sit where the card does on a phone, and
+ * pressing one would both end the arrival and turn the room, which is two
+ * answers to a tap that meant one.
+ */
+body.opening-running #view-prev,
+body.opening-running #view-next
+{
+    opacity: 0;
+    pointer-events: none;
+}
+
 /*
  * The question at the door, on a phone.
  *
@@ -364,6 +451,7 @@ body
 #hint
 {
     color: var(--dim);
+    transition: opacity 0.5s;
 }
 
 /* Desktop / mobile only elements */

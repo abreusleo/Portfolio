@@ -147,6 +147,85 @@ export default class Camera
         return this.goTo(this.station, duration, 'power3.inOut')
     }
 
+    /**
+     * One continuous move through several framings, for the way in.
+     *
+     * Not a chain of goTo calls. Chained tweens ease out and in again at every
+     * waypoint, so the camera stops three times on the way across a room it is
+     * supposed to be crossing; what reads as a travelling shot is one move that
+     * never stops. So the waypoints become two curves — one the camera rides,
+     * one it looks along — and a single tween walks both.
+     *
+     * Centripetal Catmull-Rom because the uniform kind loops and cusps when
+     * control points bunch up, and a camera that loops is a camera through a
+     * wall.
+     *
+     * The last waypoint is adopted as the station, exactly as goTo does, so
+     * whatever runs next finds the camera parked and not mid-flight.
+     */
+    flyThrough(waypoints, duration = 6.5, ease = 'power1.inOut')
+    {
+        const cam = this.instance
+        this.stopTravel()
+        this.mode = 'transition'
+
+        const last = waypoints[waypoints.length - 1]
+        this.parallaxTarget = last.parallax ?? 1
+        this.authoredFov = last.fov ?? this.authoredFov ?? null
+
+        const vec = (a) => new THREE.Vector3().fromArray(a)
+        const path = new THREE.CatmullRomCurve3(waypoints.map((w) => vec(w.position)), false, 'centripetal')
+        const aim = new THREE.CatmullRomCurve3(waypoints.map((w) => vec(w.target)), false, 'centripetal')
+
+        // Asked for every frame rather than resolved once, for the same reason
+        // goTo does it: a phone that turns mid-flight has to land correctly.
+        const fovs = waypoints.map((w) => w.fov ?? null)
+        const legs = waypoints.length - 1
+        const fovAt = (t) =>
+        {
+            const f = Math.min(t, 1) * legs
+            const i = Math.min(Math.floor(f), legs - 1)
+            const k = f - i
+            const from = fovs[i] ?? this.authoredFov
+            const to = fovs[i + 1] ?? this.authoredFov
+            if (from === null || to === null) return cam.fov
+            // Eased inside the leg as well, so the widening never has corners.
+            const e = k * k * (3 - 2 * k)
+            return this.fovFor(from + (to - from) * e)
+        }
+
+        const finish = () =>
+        {
+            this.station = last
+            this.lookTarget.copy(vec(last.target))
+            this.parallax.set(0, 0)
+            this.mode = 'overview'
+        }
+
+        const state = { t: 0 }
+        return new Promise((resolve) =>
+        {
+            this.travel = gsap.to(state, {
+                t: 1,
+                duration,
+                ease,
+                onUpdate: () =>
+                {
+                    cam.position.copy(path.getPoint(state.t))
+                    cam.lookAt(aim.getPoint(state.t))
+                    cam.fov = fovAt(state.t)
+                    cam.updateProjectionMatrix()
+                },
+                onComplete: () =>
+                {
+                    this.travel = null
+                    finish()
+                    resolve()
+                },
+            })
+        })
+    }
+
     startFly()
     {
         this.mode = 'fly'

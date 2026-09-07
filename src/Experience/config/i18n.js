@@ -32,6 +32,13 @@ export const strings = {
     modePerformanceHint: { pt: 'mais leve', en: 'lighter' },
     modeQualityHint: { pt: 'mais bonita', en: 'better looking' },
     modeSwitch: { pt: 'Imagem', en: 'Image' },
+
+    openingLine: {
+        pt: 'Uma sala com o que eu construí dentro.',
+        en: 'A room with the things I have built in it.',
+    },
+    openingSkip: { pt: 'toque para entrar', en: 'tap to enter' },
+    openingSkipDesk: { pt: 'clique para entrar', en: 'click to enter' },
     role: { pt: 'Software Engineer Backend', en: 'Backend Software Engineer' },
 
     explore: { pt: 'EXPLORAR', en: 'EXPLORE' },

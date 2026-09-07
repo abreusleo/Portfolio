@@ -3,6 +3,7 @@ import { isMobile } from './Utils/device.js'
 import { isTyping } from './Utils/typing.js'
 import { quality } from './Utils/flags.js'
 import Menu from './Menu.js'
+import Opening from './Opening.js'
 import Views from './Views.js'
 import Tour from './Tour.js'
 import { locale, strings, t } from './config/i18n.js'
@@ -88,6 +89,7 @@ export default class UI
         this.menu = new Menu()
         this.views = new Views()
         this.tour = new Tour()
+        this.opening = new Opening()
 
         // The eggs are built as one of the world's steps, so they do not exist
         // yet when this runs.
@@ -361,7 +363,11 @@ export default class UI
 
         this.loader.classList.add('hidden')
         if (!this.shotMode) this.hud.classList.remove('hidden')
-        this.camera.enter(instant ? 0 : 2.8).then(() =>
+
+        // The way in owns the arrival, and answers whether it ran at all: a
+        // returning visitor and a screenshot both get the short settle.
+        const arrived = instant ? this.camera.enter(0) : this.opening.run()
+        arrived.then(() =>
         {
             // After the arrival, not during it: a bar appearing over a camera
             // still moving reads as part of the loading rather than as an offer.
