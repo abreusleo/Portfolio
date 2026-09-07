@@ -552,41 +552,36 @@ body:not(.mobile) [data-mobile] { display: none; }
 }
 
 /*
- * The bracket around whatever the pointer is on.
+ * The caption on the patch the pointer is over.
  *
- * Hatched rather than filled: a solid panel over an object hides the object,
- * and the object is the thing being pointed at. The stripes read as a marked
- * region while leaving it visible straight through.
+ * The patch itself is in the room (see HoverFrame): a hatched quad lying on the
+ * surface, so it skews with the wall. Only the words are here, because a
+ * caption has to be upright and the same size from anywhere, which is the one
+ * thing a quad in the scene cannot be.
  *
- * It never takes a pointer event of its own. It sits exactly on top of the
- * thing it is bracketing, and the click has to reach the canvas underneath.
+ * This element is a point, not a box. It is moved to the edge of the quad each
+ * frame and the label hangs off it.
  */
 #hotspot-frame
 {
     position: fixed;
     top: 0;
     left: 0;
+    width: 0;
+    height: 0;
     z-index: 24;
     pointer-events: none;
-    border: 1px solid rgba(233, 231, 227, 0.42);
-    background: repeating-linear-gradient(
-        -45deg,
-        rgba(233, 231, 227, 0.10) 0 2px,
-        transparent 2px 8px
-    );
     transition: opacity 0.16s ease, visibility 0s linear 0.16s;
 }
 
 #hotspot-frame:not(.hidden) { transition-delay: 0s; }
 
-/* Outside the bracket and vertically centred on it, the way a caption sits
-   beside a plate rather than on it. */
 .hotspot-frame-label
 {
     position: absolute;
-    top: 50%;
-    left: 100%;
-    transform: translate(0.85rem, -50%);
+    top: 0;
+    left: 0;
+    transform: translate(0.9rem, -50%);
     color: var(--fg);
     font-size: 0.82rem;
     letter-spacing: 0.04em;
@@ -603,12 +598,11 @@ body:not(.mobile) [data-mobile] { display: none; }
 #hotspot-frame.flip .hotspot-frame-label
 {
     left: auto;
-    right: 100%;
-    transform: translate(-0.85rem, -50%);
+    right: 0;
+    transform: translate(-0.9rem, -50%);
 }
 
-/* No pointer, no bracket. A phone would have it stuck on whatever was tapped
-   last, which is the bug the trailing labels already had there. */
+/* No pointer, no caption. */
 body.mobile #hotspot-frame { display: none; }
 
 /* ------------------------------------------------------------------ */
