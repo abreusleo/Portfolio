@@ -41,6 +41,7 @@ const _side = new THREE.Vector3()
 const _up = new THREE.Vector3()
 const _normal = new THREE.Vector3()
 const _towards = new THREE.Vector3()
+const _corner = new THREE.Vector3()
 const _anchor = new THREE.Vector3()
 const _basis = new THREE.Matrix4()
 
@@ -231,9 +232,33 @@ export default class HoverFrame
      * Lays the quad on the plate the raycast hit.
      *
      * A plate is flat, so one of its three local axes is far shorter than the
-     * other two: that short one is the way it faces, and the quad spans the
-     * other two. Which is what makes the patch on the tilted laptop lid lean
-     * with the lid rather than stand upright in front of it.
+     * other two: that short one is the way it faces, and the quad lies against
+     * it.
+     *
+     * WHAT IT DOES NOT DO IS INHERIT THE PLATE'S TILT. The plates are pick
+     * targets first, and one of them is deliberately tipped sixty degrees off
+     * the desk so the camera station read from it comes out above the laptop
+     * rather than level with it — see Workstation.js. Wearing that angle put a
+     * leaning rectangle on a laptop that is lying flat, which is the tilt of
+     * something nobody can see rather than of the thing being pointed at.
+     *
+     * So the quad stands up: the plate's facing with the tilt taken out of it,
+     * and the room's own vertical. On a wall that changes nothing, because the
+     * wall was already upright. Only a surface tilted for reasons of its own
+     * notices, which is the point.
+     *
+     * Staying inside the plate's plane was not enough, and it took a
+     * measurement to see why: the most vertical line inside a plane tilted
+     * sixty degrees is still tilted sixty degrees. The quad has to leave the
+     * plane to stand up.
+     *
+     * A plate facing the ceiling has no horizontal facing to fall back to, so
+     * it keeps its own. There is no such hotspot today.
+     *
+     * The size is measured by projecting the plate's corners onto whichever
+     * pair of axes came out of that, rather than by reading its width and
+     * height off the axes it was built on. Those are the same thing only while
+     * the two agree.
      */
     place()
     {
@@ -251,25 +276,59 @@ export default class HoverFrame
 
         const [normal, a, b] = [0, 1, 2].sort((x, y) => metres(x) - metres(y))
 
-        // Of the two that are left, the one pointing nearest the ceiling is
-        // the quad's up, so the hatch leans the same way on every surface in
-        // the room instead of following whichever axis the model was built on.
-        const leanA = Math.abs(axis(a, _towards).y)
-        const leanB = Math.abs(axis(b, _towards).y)
-        const upIsB = leanB >= leanA
-        axis(upIsB ? b : a, _up)
-        if (_up.y < 0) _up.negate()
-
         axis(normal, _normal)
         _towards.copy(this.experience.camera.instance.position).sub(_centre)
         if (_normal.dot(_towards) < 0) _normal.negate()
+
+        // Laid flat: the plate's facing with the tilt taken out of it.
+        //
+        // Keeping the quad inside the plate's own plane only gets it as upright
+        // as that plane allows, and the laptop's plane is sixty degrees off the
+        // desk — so it stayed a leaning rectangle, just leaning in a tidier
+        // direction. It has to leave the plane to stand up.
+        _normal.y = 0
+
+        // Unless there was nothing but tilt: a plate facing the ceiling has no
+        // horizontal facing to fall back to, so it keeps its own.
+        if (_normal.lengthSq() < 0.02)
+        {
+            axis(normal, _normal)
+            if (_normal.dot(_towards) < 0) _normal.negate()
+
+            const leanA = Math.abs(axis(a, _towards).y)
+            axis(Math.abs(axis(b, _towards).y) >= leanA ? b : a, _up)
+            if (_up.y < 0) _up.negate()
+            _up.addScaledVector(_normal, -_up.dot(_normal))
+        }
+        else _up.set(0, 1, 0)
+
+        _normal.normalize()
+        _up.normalize()
 
         // Right-handed, or the quad is mirrored and the hatch leans the wrong
         // way on half the room.
         _side.crossVectors(_up, _normal).normalize()
 
-        const width = metres(upIsB ? a : b) + this.look.pad * 2
-        const height = metres(upIsB ? b : a) + this.look.pad * 2
+        // Measured against those axes rather than read off the ones the plate
+        // was built on: with the tilt gone the two no longer agree.
+        let halfW = 0
+        let halfH = 0
+        const box = object.geometry.boundingBox
+        for (const cx of [box.min.x, box.max.x])
+        {
+            for (const cy of [box.min.y, box.max.y])
+            {
+                for (const cz of [box.min.z, box.max.z])
+                {
+                    _corner.set(cx, cy, cz).applyMatrix4(object.matrixWorld).sub(_centre)
+                    halfW = Math.max(halfW, Math.abs(_corner.dot(_side)))
+                    halfH = Math.max(halfH, Math.abs(_corner.dot(_up)))
+                }
+            }
+        }
+
+        const width = halfW * 2 + this.look.pad * 2
+        const height = halfH * 2 + this.look.pad * 2
 
         _basis.makeBasis(_side, _up, _normal)
         this.mesh.quaternion.setFromRotationMatrix(_basis)

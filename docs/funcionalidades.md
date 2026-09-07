@@ -74,7 +74,7 @@ O que a sala tem para mostrar.
 | **Compositor** | A caixa de escrever um recado, com o post-it que se arrasta até a porta. | `#compose` · `#place-hint` · `Interactions.beginPlacing` |
 | **Contador de pessoas** | O `● 7 na sala` na barra. Vem do backend; se ele estiver fora, o contador simplesmente não aparece. | `Presence.js` · `GET /api/online` |
 | **TV** | A televisão com as demonstrações em vídeo. | `World/Tv.js` · `#player` |
-| **PC** | O computador da mesa, que abre um desktop falso com janelas. | `Desktop.js` · `#desktop` |
+| **PC** | O monitor da mesa, que abre um desktop falso com janelas. Só o monitor responde: o gabinete abria a mesma coisa, e apertar a caixa embaixo da mesa para acender uma tela é uma frase que ninguém diz. | `Desktop.js` · `#desktop` |
 
 ---
 

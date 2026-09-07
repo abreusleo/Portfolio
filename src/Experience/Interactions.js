@@ -309,25 +309,18 @@ export default class Interactions
         // the button on the wall's own panel, and the note only exists once it
         // has been pressed; see World/Notes.js addBlank.
 
-        // The tower and the main screen both wake the machine
-        const tower = scene.getObjectByName('hotspot.pc')
-        if (tower)
-        {
-            this.add({
-                object: tower,
-                id: 'pc',
-                kind: 'desktop',
-                station: stations.desk,
-                label: strings.useComputer,
-            })
-        }
-
+        // The screen wakes the machine, and only the screen.
+        //
+        // The tower answered too, which is true of a real computer and useless
+        // here: what the click opens is a desktop, and a desktop is a thing
+        // that happens on a screen. Pressing the box under the desk to make a
+        // monitor light up is a sentence nobody says.
         const mainScreen = scene.getObjectByName('screen.main')
         if (mainScreen)
         {
             this.add({
                 object: mainScreen,
-                id: 'pc.screen',
+                id: 'pc',
                 kind: 'desktop',
                 station: stations.desk,
                 label: strings.useComputer,
