@@ -457,6 +457,12 @@ export default class Interactions
         // walked anywhere.
         this.experience.ui?.tour?.stop()
 
+        // Nor do they need the lights that pointed them here. They are about
+        // to stand a metre from one of them, where a wash sized for the far
+        // side of the room is a floodlight; and the question it answers, which
+        // is whether this can be pressed, has just been answered by pressing.
+        this.markers?.dim(true)
+
         if (hotspot.kind === 'compose') this.openCompose()
         else if (hotspot.kind === 'video') this.openVideo()
         else if (hotspot.kind === 'desktop') this.openDesktop()
@@ -868,6 +874,7 @@ export default class Interactions
         this.player.close()
         this.panel.close()
         this.hideDesktop()
+        this.markers?.dim(false)
         this.camera.goTo(stations.overview, 1.4, 'power2.inOut')
     }
 
