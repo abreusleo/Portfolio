@@ -67,7 +67,6 @@ export default class Experience
     resize()
     {
         this.camera.resize()
-        this.interactions?.markers?.resize()
         this.renderer.resize()
     }
 

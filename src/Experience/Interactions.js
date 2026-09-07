@@ -10,7 +10,6 @@ import { api, enabled as notesEnabled, MAX_LENGTH, wall } from './config/notes.j
 import { isTyping } from './Utils/typing.js'
 import { isMobile } from './Utils/device.js'
 import Desktop from './Desktop.js'
-import Markers from './World/Markers.js'
 
 /**
  * Clickable objects in the scene.
@@ -340,13 +339,6 @@ export default class Interactions
         this.enabled = true
         this.warnEggsOnHotspots()
 
-        // Before the `?open` shortcut returns, and before prewarm: this adds a
-        // material to the scene, and a material that is not in the scene when
-        // prewarm runs is a shader compiled on the frame it is first drawn —
-        // a third of a second of frozen room, which is what prewarm exists to
-        // prevent. Placed after the early return, it simply never ran.
-        this.markers = new Markers(this.hotspots)
-
         // `?open=prints` or `?open=print.03` jumps straight there, for screenshots.
         const open = new URLSearchParams(window.location.search).get('open')
         if (!open) return
@@ -456,12 +448,6 @@ export default class Interactions
         // Somebody who has started opening things does not need to be
         // walked anywhere.
         this.experience.ui?.tour?.stop()
-
-        // Nor do they need the lights that pointed them here. They are about
-        // to stand a metre from one of them, where a wash sized for the far
-        // side of the room is a floodlight; and the question it answers, which
-        // is whether this can be pressed, has just been answered by pressing.
-        this.markers?.dim(true)
 
         if (hotspot.kind === 'compose') this.openCompose()
         else if (hotspot.kind === 'video') this.openVideo()
@@ -874,7 +860,6 @@ export default class Interactions
         this.player.close()
         this.panel.close()
         this.hideDesktop()
-        this.markers?.dim(false)
         this.camera.goTo(stations.overview, 1.4, 'power2.inOut')
     }
 
