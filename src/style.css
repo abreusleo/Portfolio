@@ -689,12 +689,6 @@ body.opening-running .switches
     letter-spacing: 0.06em;
 }
 
-.tag
-{
-    color: var(--dim);
-    margin-left: 0.6rem;
-}
-
 /*
  * State by brightness, not by colour.
  *

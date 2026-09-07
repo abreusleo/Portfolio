@@ -144,12 +144,12 @@ function links() {
         row(label, `<a href="${escape(href)}">${escape(href)}</a>`, 14))
 }
 
-const banner = `██╗     ███████╗ ██████╗ ███╗   ██╗ █████╗ ██████╗ ██████╗  ██████╗
-██║     ██╔════╝██╔═══██╗████╗  ██║██╔══██╗██╔══██╗██╔══██╗██╔═══██╗
-██║     █████╗  ██║   ██║██╔██╗ ██║███████║██████╔╝██║  ██║██║   ██║
-██║     ██╔══╝  ██║   ██║██║╚██╗██║██╔══██║██╔══██╗██║  ██║██║   ██║
-███████╗███████╗╚██████╔╝██║ ╚████║██║  ██║██║  ██║██████╔╝╚██████╔╝
-╚══════╝╚══════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝`
+const banner = `██╗     ███████╗ ██████╗     █████╗ ██████╗ ██████╗ ███████╗██╗   ██╗
+██║     ██╔════╝██╔═══██╗   ██╔══██╗██╔══██╗██╔══██╗██╔════╝██║   ██║
+██║     █████╗  ██║   ██║   ███████║██████╔╝██████╔╝█████╗  ██║   ██║
+██║     ██╔══╝  ██║   ██║   ██╔══██║██╔══██╗██╔══██╗██╔══╝  ██║   ██║
+███████╗███████╗╚██████╔╝   ██║  ██║██████╔╝██║  ██║███████╗╚██████╔╝
+╚══════╝╚══════╝ ╚═════╝    ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚══════╝ ╚═════╝ `
 
 const body = [
     section('PROFILE', [
@@ -180,7 +180,10 @@ const html = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Machine view — ${escape(profile.name)}</title>
+    <title>Machine view — ${escape(profile.short)}</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="./favicon.png" sizes="32x32" type="image/png">
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png">
     <meta name="description" content="Plain-text mirror of ${escape(profile.name)}'s portfolio for AI agents, crawlers and humans who prefer it raw.">
     <style>
         :root { --bg: #07080c; --fg: #d7dbe3; --dim: #6f7482; --accent: #ff8a3d; }

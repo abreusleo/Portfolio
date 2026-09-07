@@ -12,6 +12,11 @@
  */
 export default {
     name: 'Leonardo Santos Abreu',
+
+    // What the site is called, as against who it is about. The record below
+    // keeps the whole name because that is what a record is for; the tab, the
+    // bar and the masthead carry the short one, because that is a mark.
+    short: 'Léo Abreu',
     handle: 'abreusleo',
     role: 'Software Engineer Backend',
     company: 'Pismo, a Visa company',

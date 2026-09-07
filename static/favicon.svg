@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Léo Abreu">
+    <!--
+        The mark is the room's own punctuation.
+
+        Two slashes open the loader's log, the line that ends the way in and
+        the one thing the wall asks for, so the site already signs itself this
+        way in three places. Set solid and wide rather than as strokes: at the
+        sixteen pixels a tab actually gets, a hairline is a smudge.
+
+        On its own ground rather than transparent — a tab strip can be light,
+        and orange on white is not this room.
+    -->
+    <rect width="32" height="32" rx="6" fill="#0b0c0e"/>
+    <g fill="#ff8a3d">
+        <path d="M13.4 6H18L10.6 26H6Z"/>
+        <path d="M22.4 6H27L19.6 26H15Z"/>
+    </g>
+</svg>
