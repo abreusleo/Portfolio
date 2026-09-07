@@ -334,6 +334,7 @@ export default class UI
             if (!instant) this.tour?.start()
         })
         this.experience.renderer.reveal(instant ? 0 : 2.6)
+        this.experience.interactions.markers?.reveal(instant ? 0.6 : 1.8)
     }
 
     wasEntered()
