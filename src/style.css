@@ -2154,10 +2154,9 @@ body.no-blur #compose
 }
 
 /*
- * The last stop asks for something, so it keeps both answers instead of one,
- * and it carries a sentence rather than a name. Three of those in a row leaves
- * the text a word per line on a phone, so this stop alone is two rows: what it
- * says, then what to do about it.
+ * The last stop carries a sentence where every other one carries a name, and a
+ * sentence beside a button is a word per line on a phone. So this stop alone is
+ * two rows: what it says, then the way out of it.
  */
 #tour.tour-last
 {

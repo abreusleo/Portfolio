@@ -19,9 +19,10 @@ import stations from './config/stations.js'
  * names it, and reading stays the visitor's own choice — which also means the
  * tour is over the moment they press something themselves.
  *
- * The last stop is the exception, and deliberately so: it is the only one that
- * asks for something rather than showing something, and an invitation whose
- * button does not do the thing it invites is a sentence, not an offer.
+ * The last stop carries a line asking for a note, and that is all it does: the
+ * words are "do not forget", which is about later, and a button that opened the
+ * composer would have turned a reminder into a demand at the one moment the
+ * visitor has finally been handed the room.
  */
 
 /**
@@ -67,7 +68,7 @@ export default class Tour
 
         this.inviteEl = document.getElementById('tour-invite')
 
-        this.nextButton.addEventListener('click', () => this.finish())
+        this.nextButton.addEventListener('click', () => this.advance())
         this.skipButton.addEventListener('click', () => this.stop(true))
         locale.on('change', () => { if (this.running) this.draw() })
     }
@@ -127,31 +128,13 @@ export default class Tour
         this.titleEl.textContent = entry ? (t(entry.title) ?? '') : (t(hotspot?.label) ?? '')
         this.stepEl.textContent = `${this.at + 1}/${STEPS.length}`
 
+        // On the last stop there is nothing left to skip: the one button ends
+        // the walk and hands the room over, which is the same thing.
         const last = this.at === STEPS.length - 1
-        this.nextButton.textContent = t(last ? strings.tourLeave : strings.tourNext)
-
-        // Kept on the last stop rather than hidden, because there it stops
-        // being an escape and becomes the other answer to the invitation.
-        this.skipButton.textContent = t(last ? strings.tourDone : strings.tourSkip)
-        this.skipButton.hidden = false
+        this.nextButton.textContent = t(last ? strings.tourDone : strings.tourNext)
+        this.skipButton.hidden = last
         this.inviteEl?.classList.toggle('hidden', !last)
         this.root.classList.toggle('tour-last', last)
-    }
-
-    /**
-     * The primary button: one more stop, or the thing the last stop asks for.
-     *
-     * Ending here does not walk back to the overview the way every other exit
-     * does. The visitor is standing in front of the door being invited to write
-     * on it, and pulling the camera across the room in the same breath is the
-     * site taking back its own offer.
-     */
-    finish()
-    {
-        if (this.at < STEPS.length - 1) return this.advance()
-
-        this.stop(false)
-        this.experience.interactions?.openCompose()
     }
 
     /**
