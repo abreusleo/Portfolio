@@ -18,17 +18,21 @@ import { quality } from '../Utils/flags.js'
  * centred and radial, which puts a soft smudge in the middle of the television
  * and reads as a dirty lens.
  *
- * What this is now is the light over a painting in a gallery. Small, hard to
- * mistake for anything else, and the warm yellow of a halogen rather than the
- * colour of the decor: a real fixture does not change bulbs to match the wall.
- * It hangs just over the top edge of the thing and pools there, lying on the
- * surface and taking its angle, so the tilted laptop lid gets a tilted one and
- * nothing lands in the middle of a screen.
+ * What this is now is a shaded lamp washing a wall. The mouth of a beam meeting
+ * a flat surface draws a conic: a vertex where it strikes, two arms opening
+ * away from it, and no bottom at all. Brightest along that arc, spent on the
+ * way down, and wider than it is loud.
  *
- * The pool has an edge. A wash that only fades reads as haze on the lens; a
- * light reads as a light because it stops somewhere, with a soft rim rather
- * than a hard one. Additive over a core bright enough for the composer's bloom
- * to catch and carry, the way it already carries the strip and the desk lamp.
+ * The version before this one was a bright closed disc, and a bright closed
+ * disc is an object. It took the eye instead of pointing it, which is the one
+ * failure a highlight cannot have: everything it lights matters more than it
+ * does. So the peak now stays under the composer's bloom threshold on purpose.
+ * Crossing it turns a lamp into a flare, and a flare is the loudest thing on
+ * the screen.
+ *
+ * It hangs just over the top edge of the thing and lies on the surface, taking
+ * its angle, so the tilted laptop lid gets a tilted one and nothing lands in
+ * the middle of a screen.
  *
  * NOT on the hidden things. eggs.js is explicit that a plate is never drawn,
  * "not so much that the room hands out a map", and that stands: this is built
@@ -50,25 +54,25 @@ const ABOVE = 0.02
  * Narrow on purpose. A pool as wide as the thing it lights is a floodlit wall,
  * and a floodlit wall says nothing about which wall matters.
  */
-const SPREAD = 0.72
-const MIN_HALF = 0.1
-const MAX_HALF = 0.34
+const SPREAD = 0.85
+const MIN_HALF = 0.18
+const MAX_HALF = 0.55
 
 /** How far it falls before it is gone, as a share of the object's height. */
-const FALL = 0.75
-const MIN_FALL = 0.32
-const MAX_FALL = 0.7
+const FALL = 1.1
+const MIN_FALL = 0.5
+const MAX_FALL = 1.05
 
 /**
- * Where the pool's middle sits, measured down from the quad's top edge.
+ * Where the beam strikes, measured down from the quad's top edge.
  *
- * The shader's CY is the same number from the other end; they have to agree,
- * or the light stops landing where the geometry was hung for it to land.
+ * The shader's VERTEX is the same point counted from the other end; the two
+ * have to agree, or the light stops landing where it was hung to land.
  */
-const CROWN = 0.38
+const CROWN = 0.05
 
 /** How bright they settle, once the visitor is in the room. */
-const LIT = 0.62
+const LIT = 0.6
 
 export default class Markers
 {
@@ -91,17 +95,16 @@ export default class Markers
             depthWrite: false,
             side: THREE.DoubleSide,
             uniforms: {
-                // A halogen picture light, not the theme's accent. Three of
-                // the four themes would tint this — one of them nearly white —
-                // and a fixture that changes colour with the paint is the one
+                // A halogen lamp, not the theme's accent. Three of the four
+                // themes would tint this — one of them nearly white — and a
+                // fixture that changes bulbs to match the paint is the one
                 // thing in the room that could not be a fixture.
                 //
-                // Well past the bloom threshold at the core, so the composer
-                // spreads it and it arrives as light rather than as a shape.
+                // Scaled to land under the bloom threshold at its brightest.
+                // Over it the composer blows the peak into a flare, and the
+                // marker becomes the loudest object in the room.
                 uColor: {
-                    value: new THREE.Color('#ffc247')
-                        .lerp(new THREE.Color('#fff0cf'), 0.32)
-                        .multiplyScalar(3.1),
+                    value: new THREE.Color('#ffb765').multiplyScalar(1.35),
                 },
                 uOpacity: { value: 0 },
             },
@@ -118,30 +121,30 @@ export default class Markers
                 uniform float uOpacity;
                 varying vec2 vUv;
 
-                /** Where the pool's middle sits in the quad, from the bottom. */
-                #define CY 0.62
+                /** Where the beam strikes the surface, from the bottom. */
+                #define VERTEX 0.95
 
                 void main()
                 {
-                    // A cone meeting a wall makes a rounded pool, not a
-                    // wedge: closed at the top where the beam is tight, opened
-                    // and dropped towards the bottom where it has travelled
-                    // furthest. Straight sides and a flat top read as the
-                    // silhouette of a lampshade, which is the wrong object.
                     float y = vUv.y;
                     float x = abs((vUv.x - 0.5) * 2.0);
 
-                    // Half-width at this height, and how far up or down the
-                    // pool this pixel is, each on its own scale so the shape
-                    // closes at both ends.
-                    float w = mix(0.62, 1.0, 1.0 - y);
-                    float dy = (y - CY) / (y > CY ? 1.0 - CY : CY);
-                    float d = length(vec2(x / w, dy));
+                    // The near edge of the beam. Flat across the middle and
+                    // then falling away, which is the dome a shade throws: a
+                    // plain parabola here came to a point and read as a hat.
+                    // Left open at the bottom, because closing the shape makes
+                    // a disc, and a disc is an object.
+                    float edge = VERTEX - 1.15 * pow(x, 2.6);
+                    float inside = smoothstep(-0.07, 0.04, edge - y);
 
-                    // Full inside, then a rim. The plateau is what makes it a
-                    // light: something that only fades is haze on the lens.
-                    float glow = smoothstep(1.0, 0.42, d);
-                    if (glow < 0.003) discard;
+                    // Brightest at the strike and spent on the way down, so
+                    // what covers most of the surface is the weak part of it.
+                    float fall = exp(-max(0.0, VERTEX - y) * 2.1);
+
+                    // Gone by the foot of the quad, so the quad is never an
+                    // edge anybody can find.
+                    float glow = inside * fall * smoothstep(0.0, 0.16, y);
+                    if (glow < 0.002) discard;
 
                     gl_FragColor = vec4(uColor * glow * uOpacity, 1.0);
                 }
