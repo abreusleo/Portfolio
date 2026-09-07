@@ -32,6 +32,7 @@ export const strings = {
     modePerformanceHint: { pt: 'mais leve', en: 'lighter' },
     modeQualityHint: { pt: 'mais bonita', en: 'better looking' },
     modeSwitch: { pt: 'Imagem', en: 'Image' },
+    online: { pt: 'na sala', en: 'in the room' },
 
     openingLine: {
         pt: 'Uma sala com o que eu construí dentro.',

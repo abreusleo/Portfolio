@@ -4,6 +4,7 @@ import { isTyping } from './Utils/typing.js'
 import { quality } from './Utils/flags.js'
 import Menu from './Menu.js'
 import Opening from './Opening.js'
+import Presence from './Presence.js'
 import Views from './Views.js'
 import Tour from './Tour.js'
 import { locale, strings, t } from './config/i18n.js'
@@ -90,6 +91,7 @@ export default class UI
         this.views = new Views()
         this.tour = new Tour()
         this.opening = new Opening()
+        this.presence = new Presence()
 
         // The eggs are built as one of the world's steps, so they do not exist
         // yet when this runs.

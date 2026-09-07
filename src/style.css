@@ -408,8 +408,88 @@ body.opening-running #view-next
     pointer-events: auto;
 }
 
-.hud-tl { top: 0; left: 0; }
-.hud-tr { top: 0; right: 0; }
+/*
+ * The two top corners are one bar.
+ *
+ * They were two floating clusters over the room, which is fine over a picture
+ * and unreadable over a room: the wordmark sat on whatever happened to be
+ * behind it. A strip behind both gives them a ground to sit on and a line to
+ * sit above, and costs the room a centimetre of ceiling it was not using.
+ */
+.hud-bar
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3.15rem;
+    background: linear-gradient(rgba(9, 10, 12, 0.82), rgba(9, 10, 12, 0.55));
+    border-bottom: 1px solid rgba(233, 231, 227, 0.10);
+    pointer-events: none;
+}
+
+/* Specific enough to beat #hud > div, which sets the padding for all four. */
+#hud > .hud-tl,
+#hud > .hud-tr
+{
+    top: 0;
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    padding-top: 0.95rem;
+    padding-bottom: 0.95rem;
+}
+
+.hud-tl { left: 0; }
+.hud-tr { right: 0; }
+
+/*
+ * A bar needs a width to be a bar. Three hundred and ninety pixels is not one:
+ * laid out in a row, the two ends run into each other and the wordmark ends up
+ * printed over the language switch. So the phone keeps the stacked corners it
+ * always had, and the head count joins the stack instead of the row.
+ */
+body.mobile .hud-bar { display: none; }
+
+body.mobile #hud > .hud-tl,
+body.mobile #hud > .hud-tr
+{
+    display: block;
+    padding-top: 1.2rem;
+    padding-bottom: 1.2rem;
+}
+
+body.mobile .menu-open { margin-top: 0.65rem; }
+body.mobile .online { justify-content: flex-end; margin-bottom: 0.35rem; }
+
+/*
+ * The head count, which is the one thing on screen that is only true now.
+ *
+ * It starts hidden and is only ever shown once a real answer has arrived: the
+ * box it comes from is allowed to be down, and a header advertising a broken
+ * widget is worse than one that never mentioned a count.
+ */
+.online
+{
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--dim);
+    white-space: nowrap;
+}
+
+.online.hidden { display: none; }
+
+.online #online-count { color: var(--fg); }
+
+.online-dot
+{
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.7);
+}
 .hud-bl { bottom: 0; left: 0; }
 .hud-br { bottom: 0; right: 0; }
 
@@ -1722,7 +1802,6 @@ body.mobile #hotspot-frame { display: none; }
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-top: 0.65rem;
     padding: 0.4rem 0.7rem 0.4rem 0.55rem;
     background: rgba(11, 12, 14, 0.55);
     border: 1px solid rgba(233, 231, 227, 0.16);

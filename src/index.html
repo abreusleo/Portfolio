@@ -62,6 +62,9 @@
 
     <!-- HUD -->
     <div id="hud" class="hidden">
+        <!-- The strip the two top corners sit on, so they read as one bar. -->
+        <i class="hud-bar" aria-hidden="true"></i>
+
         <div class="hud-tl">
             <span class="wordmark">LEONARDO</span><span class="tag">/ portfolio</span>
             <button id="menu-open" class="menu-open" type="button" aria-expanded="false" aria-controls="menu">
@@ -70,6 +73,10 @@
             </button>
         </div>
         <div class="hud-tr">
+            <p id="online" class="online hidden">
+                <span class="online-dot" aria-hidden="true"></span><span
+                    id="online-count">0</span> <span id="online-label">na sala</span>
+            </p>
             <div class="mode-toggle">
                 <span class="active">HUMAN</span><span class="sep">/</span><a href="./machine.html">MACHINE</a>
             </div>

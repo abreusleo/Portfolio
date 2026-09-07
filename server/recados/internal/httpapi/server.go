@@ -14,6 +14,7 @@ package httpapi
 
 import (
 	"context"
+	"crypto/rand"
 	"encoding/json"
 	"errors"
 	"log/slog"
@@ -25,6 +26,7 @@ import (
 	"recados/internal/config"
 	"recados/internal/geo"
 	"recados/internal/moderation"
+	"recados/internal/presence"
 	"recados/internal/store"
 )
 
@@ -38,6 +40,7 @@ type Server struct {
 	readLimit  *Limiter
 	writeLimit *Limiter
 	dailyWrite Rule
+	present    *presence.Counter
 }
 
 // The windows. Reading is generous; writing is not, because a note is meant to
@@ -80,6 +83,7 @@ func New(cfg config.Config, st *store.Store, resolver *geo.Resolver, moderator *
 		geo:        resolver,
 		moderator:  moderator,
 		log:        log,
+		present:    presence.New(salt()),
 		readLimit:  NewLimiter(0, readRules...),
 		writeLimit: NewLimiter(0, Rule{Max: 1, Window: cfg.WriteEvery}),
 		dailyWrite: Rule{Max: cfg.WritePerDay, Window: 24 * time.Hour},
@@ -89,12 +93,28 @@ func New(cfg config.Config, st *store.Store, resolver *geo.Resolver, moderator *
 func (s *Server) Close() {
 	s.readLimit.Close()
 	s.writeLimit.Close()
+	s.present.Close()
+}
+
+// A fresh salt each boot, so the keys the presence counter holds cannot be
+// matched against anything from a previous run or from anywhere else. It is
+// never persisted, which is the point.
+func salt() [16]byte {
+	var b [16]byte
+	if _, err := rand.Read(b[:]); err != nil {
+		// The only failure mode of crypto/rand on a running box is a broken
+		// one. Counting visitors is not worth refusing to start over, and an
+		// all-zero salt still separates one address from another.
+		return b
+	}
+	return b
 }
 
 func (s *Server) Handler() http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /api/notes", s.listNotes)
+	mux.HandleFunc("GET /api/online", s.online)
 	mux.HandleFunc("POST /api/notes", s.createNote)
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
@@ -133,6 +153,23 @@ func toResponse(n store.Note) noteResponse {
 		X:         n.X,
 		Y:         n.Y,
 	}
+}
+
+// online records the caller as being here and answers with the head count.
+//
+// A GET that writes something, which is not free of sin, but what it writes is
+// a timestamp in a map that forgets it a minute later, and making the page
+// POST to say hello would buy nothing but a preflight on every heartbeat.
+func (s *Server) online(w http.ResponseWriter, r *http.Request) {
+	addr := ClientIP(r, s.cfg.TrustedProxies)
+	if verdict, retry := s.readLimit.Allow(addr.String()); verdict != Allowed {
+		s.refuse(w, verdict, retry)
+		return
+	}
+
+	// Not cached anywhere: a count that is a minute old is a wrong count.
+	w.Header().Set("Cache-Control", "no-store")
+	writeJSON(w, http.StatusOK, map[string]int{"online": s.present.Seen(addr.String())})
 }
 
 func (s *Server) listNotes(w http.ResponseWriter, r *http.Request) {
