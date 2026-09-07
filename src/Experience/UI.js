@@ -52,6 +52,8 @@ export default class UI
         this.barEl = document.getElementById('bar')
         this.logEl = document.getElementById('log')
         this.enterButton = document.getElementById('enter')
+        this.modeAsk = document.getElementById('mode-ask')
+        this.modeButtons = [...document.querySelectorAll('#mode-ask [id^="mode-"]')]
         this.exploreButton = document.getElementById('explore')
         this.hint = document.getElementById('hint')
 
@@ -122,6 +124,38 @@ export default class UI
         if (this.world.dressed) this.onSceneReady()
 
         this.enterButton.addEventListener('click', () => this.enter())
+        this.setMode()
+    }
+
+    /**
+     * The question at the door: performance or quality, once, on a phone.
+     *
+     * The room is authored for a desktop and a phone is where that costs
+     * something, so this asks instead of deciding — but only where the
+     * trade-off is real, only while nobody has answered, and never in the way
+     * of somebody who already has. A returning visitor never sees the gate at
+     * all, so they never see this either.
+     *
+     * Answering is entering. A separate confirm step after the answer would be
+     * a second button for a decision already made.
+     */
+    setMode()
+    {
+        const quality = this.experience.quality
+        if (!this.modeAsk || !isMobile || this.shotMode || this.returning || !quality?.unasked) return
+
+        this.asking = true
+        this.modeAsk.classList.remove('hidden')
+        this.enterButton.classList.add('hidden')
+
+        for (const button of this.modeButtons)
+        {
+            button.addEventListener('click', () =>
+            {
+                quality.choose(button.id.replace('mode-', ''))
+                this.enter()
+            })
+        }
     }
 
     /** The room is standing and the models are in it. */
@@ -380,6 +414,7 @@ export default class UI
         if (this.sceneReady && pct >= 100 && this.enterButton.disabled)
         {
             this.enterButton.disabled = false
+            for (const button of this.modeButtons ?? []) button.disabled = false
             this.step = null
             this.logEl.dataset.i18n = 'ready'
             this.logEl.textContent = t(strings.ready)

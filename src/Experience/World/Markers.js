@@ -18,16 +18,17 @@ import { quality } from '../Utils/flags.js'
  * centred and radial, which puts a soft smudge in the middle of the television
  * and reads as a dirty lens.
  *
- * This one borrows from what is already in the room. Every light here is
- * overhead — the ceiling strip, the track over the shelves — and each throws
- * the same shape: a narrow bright patch high up that widens and dies as it
- * falls. So each hotspot gets that shape, hung from just above the thing and
- * spilling down over it, lying on the surface and taking its angle. The tilted
- * laptop lid gets a tilted one. Nothing lands in the middle of a screen.
+ * What this is now is the light over a painting in a gallery. Small, hard to
+ * mistake for anything else, and the warm yellow of a halogen rather than the
+ * colour of the decor: a real fixture does not change bulbs to match the wall.
+ * It hangs just over the top edge of the thing and pools there, lying on the
+ * surface and taking its angle, so the tilted laptop lid gets a tilted one and
+ * nothing lands in the middle of a screen.
  *
- * Additive, so it brightens what is under it instead of covering it, with a
- * crown bright enough for the composer's bloom to catch and carry the way it
- * already carries the strip and the desk lamp.
+ * The pool has an edge. A wash that only fades reads as haze on the lens; a
+ * light reads as a light because it stops somewhere, with a soft rim rather
+ * than a hard one. Additive over a core bright enough for the composer's bloom
+ * to catch and carry, the way it already carries the strip and the desk lamp.
  *
  * NOT on the hidden things. eggs.js is explicit that a plate is never drawn,
  * "not so much that the room hands out a map", and that stands: this is built
@@ -43,20 +44,31 @@ const LIFT = 0.03
 /** Where the brightest part lands: just over the top edge, never on the face. */
 const ABOVE = 0.02
 
-/** Half-widths in metres. A two-metre wall does not get a two-metre sun. */
-const MIN_HALF = 0.13
-const MAX_HALF = 0.62
+/**
+ * Half-widths in metres, and how much of the object's own width it takes.
+ *
+ * Narrow on purpose. A pool as wide as the thing it lights is a floodlit wall,
+ * and a floodlit wall says nothing about which wall matters.
+ */
+const SPREAD = 0.72
+const MIN_HALF = 0.1
+const MAX_HALF = 0.34
 
 /** How far it falls before it is gone, as a share of the object's height. */
-const FALL = 0.9
-const MIN_FALL = 0.42
-const MAX_FALL = 0.95
+const FALL = 0.75
+const MIN_FALL = 0.32
+const MAX_FALL = 0.7
 
-/** Where the crown sits inside the quad, measured down from its top edge. */
-const CROWN = 0.18
+/**
+ * Where the pool's middle sits, measured down from the quad's top edge.
+ *
+ * The shader's CY is the same number from the other end; they have to agree,
+ * or the light stops landing where the geometry was hung for it to land.
+ */
+const CROWN = 0.38
 
 /** How bright they settle, once the visitor is in the room. */
-const LIT = 0.55
+const LIT = 0.62
 
 export default class Markers
 {
@@ -79,13 +91,17 @@ export default class Markers
             depthWrite: false,
             side: THREE.DoubleSide,
             uniforms: {
-                // Warm, and past the bloom threshold at the crown on purpose:
-                // this is meant to read as the room being lit there, not as a
-                // colour someone painted on it.
+                // A halogen picture light, not the theme's accent. Three of
+                // the four themes would tint this — one of them nearly white —
+                // and a fixture that changes colour with the paint is the one
+                // thing in the room that could not be a fixture.
+                //
+                // Well past the bloom threshold at the core, so the composer
+                // spreads it and it arrives as light rather than as a shape.
                 uColor: {
-                    value: new THREE.Color(this.theme.accent)
-                        .lerp(new THREE.Color('#fff3e4'), 0.62)
-                        .multiplyScalar(2.3),
+                    value: new THREE.Color('#ffc247')
+                        .lerp(new THREE.Color('#fff0cf'), 0.32)
+                        .multiplyScalar(3.1),
                 },
                 uOpacity: { value: 0 },
             },
@@ -102,20 +118,29 @@ export default class Markers
                 uniform float uOpacity;
                 varying vec2 vUv;
 
+                /** Where the pool's middle sits in the quad, from the bottom. */
+                #define CY 0.62
+
                 void main()
                 {
-                    // A cone seen where it lands: tight at the top, opening as
-                    // it falls, the way the track lights open on the far wall.
+                    // A cone meeting a wall makes a rounded pool, not a
+                    // wedge: closed at the top where the beam is tight, opened
+                    // and dropped towards the bottom where it has travelled
+                    // furthest. Straight sides and a flat top read as the
+                    // silhouette of a lampshade, which is the wrong object.
                     float y = vUv.y;
-                    float spread = mix(0.42, 1.0, 1.0 - y);
-                    float across = smoothstep(1.0, 0.0, clamp(abs((vUv.x - 0.5) * 2.0) / spread, 0.0, 1.0));
+                    float x = abs((vUv.x - 0.5) * 2.0);
 
-                    // Brightest a little under the top edge, gone by the floor
-                    // of the quad, and eased off at the very top so the light
-                    // never ends on a straight line.
-                    float down = smoothstep(1.0, 0.82, y) * smoothstep(0.0, 0.85, y);
+                    // Half-width at this height, and how far up or down the
+                    // pool this pixel is, each on its own scale so the shape
+                    // closes at both ends.
+                    float w = mix(0.62, 1.0, 1.0 - y);
+                    float dy = (y - CY) / (y > CY ? 1.0 - CY : CY);
+                    float d = length(vec2(x / w, dy));
 
-                    float glow = pow(across * down, 1.6);
+                    // Full inside, then a rim. The plateau is what makes it a
+                    // light: something that only fades is haze on the lens.
+                    float glow = smoothstep(1.0, 0.42, d);
                     if (glow < 0.003) discard;
 
                     gl_FragColor = vec4(uColor * glow * uOpacity, 1.0);
@@ -195,7 +220,7 @@ export default class Markers
             towards.fromArray(hotspot.station.position).sub(centre)
             if (facing.dot(towards) < 0) facing.negate()
 
-            const half = THREE.MathUtils.clamp(wide * 0.5 * 1.3, MIN_HALF, MAX_HALF)
+            const half = THREE.MathUtils.clamp(wide * 0.5 * SPREAD, MIN_HALF, MAX_HALF)
             const fall = THREE.MathUtils.clamp(tall * FALL, MIN_FALL, MAX_FALL)
 
             // Hung so the crown lands just over the top edge and the rest is

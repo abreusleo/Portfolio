@@ -33,6 +33,21 @@
                 </div>
                 <button id="enter" class="btn" data-i18n="enter" disabled>ENTRAR</button>
             </div>
+
+            <!-- Only ever shown on a phone, and only until it is answered -->
+            <div id="mode-ask" class="mode-ask hidden">
+                <p class="mode-ask-line" data-i18n="modeAsk">A sala foi feita para tela grande. No celular, como você prefere ver?</p>
+                <div class="mode-ask-row">
+                    <button id="mode-performance" class="btn mode-btn" type="button" disabled>
+                        <span data-i18n="modePerformance">PERFORMANCE</span>
+                        <em data-i18n="modePerformanceHint">mais leve</em>
+                    </button>
+                    <button id="mode-quality" class="btn mode-btn" type="button" disabled>
+                        <span data-i18n="modeQuality">QUALIDADE</span>
+                        <em data-i18n="modeQualityHint">mais bonita</em>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -93,6 +108,14 @@
             <button id="menu-close" class="menu-close" type="button" data-i18n-aria="menuClose" aria-label="Fechar menu">&times;</button>
         </div>
         <ul id="menu-list" class="menu-list"></ul>
+
+        <!-- Phone only: the answer given at the door, changeable afterwards -->
+        <div id="menu-mode" class="menu-mode hidden">
+            <span class="menu-mode-label" data-i18n="modeSwitch">Imagem</span>
+            <div class="menu-mode-row">
+                <button type="button" data-mode="performance" data-i18n="modePerformance">PERFORMANCE</button><button type="button" data-mode="quality" data-i18n="modeQuality">QUALIDADE</button>
+            </div>
+        </div>
     </nav>
 
     <!-- Hover label for clickable objects -->

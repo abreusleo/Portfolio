@@ -170,6 +170,62 @@ body
     color: var(--accent);
 }
 
+/*
+ * The question at the door, on a phone.
+ *
+ * It replaces the single way in rather than sitting beside it: two buttons
+ * that both enter are an answer given by entering, and nobody has to decide
+ * whether they are allowed to skip it.
+ */
+.mode-ask
+{
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    padding-top: clamp(0.8rem, 2vw, 1.3rem);
+    margin-top: clamp(0.8rem, 2vw, 1.3rem);
+}
+
+.mode-ask.hidden { display: none; }
+
+.mode-ask-line
+{
+    color: var(--dim);
+    font-size: 0.78rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    max-width: 32ch;
+}
+
+.mode-ask-row
+{
+    display: flex;
+    gap: 0.6rem;
+}
+
+/* Two classes deep because .btn is defined below and would win on order. */
+.btn.mode-btn
+{
+    flex: 1;
+    /* Otherwise a flex item refuses to shrink under its own text and the
+       pair runs off the right of a narrow phone. */
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.8rem 0.5rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+}
+
+.mode-btn em
+{
+    font-style: normal;
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
+    text-transform: lowercase;
+    opacity: 0.62;
+}
+
 /* ------------------------------------------------------------------ */
 /* Buttons                                                             */
 /* ------------------------------------------------------------------ */
@@ -1593,6 +1649,44 @@ body:not(.mobile) [data-mobile] { display: none; }
 .menu-close:hover { color: var(--fg); }
 
 .menu-list { list-style: none; overflow-y: auto; flex: 1; padding: 0.6rem 0; }
+
+/* The answer given at the door, kept where somebody would go looking for it. */
+.menu-mode
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 1.4rem;
+    border-top: 1px solid rgba(233, 231, 227, 0.1);
+}
+
+.menu-mode.hidden { display: none; }
+
+.menu-mode-label
+{
+    font-size: 0.66rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dim);
+}
+
+.menu-mode-row { display: flex; border: 1px solid rgba(233, 231, 227, 0.18); }
+
+.menu-mode-row button
+{
+    font-family: inherit;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    padding: 0.45rem 0.7rem;
+    background: none;
+    border: 0;
+    color: var(--dim);
+    cursor: pointer;
+}
+
+.menu-mode-row button + button { border-left: 1px solid rgba(233, 231, 227, 0.18); }
+.menu-mode-row button.active { background: var(--accent); color: var(--bg); }
 
 .menu-item
 {

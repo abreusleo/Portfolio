@@ -1,5 +1,6 @@
 import Experience from './Experience.js'
 import { locale, strings, t } from './config/i18n.js'
+import { isMobile } from './Utils/device.js'
 
 /**
  * Every place in the room, as a list.
@@ -62,6 +63,51 @@ export default class Menu
         })
 
         locale.on('change', () => { if (this.open) this.render() })
+
+        this.setModeSwitch()
+    }
+
+    /**
+     * The answer given at the door, changeable afterwards.
+     *
+     * Asked once and never asked again, the choice would be a decision the
+     * visitor cannot revisit — including the one they got wrong, which is the
+     * only one they would want back. This is where somebody already comes to
+     * look for the way around the room, so it is where the switch lives.
+     *
+     * Phone only, because the question is only asked there, and hidden when a
+     * query flag is driving the renderer by hand: those exist to be tested
+     * against and a button fighting them helps nobody.
+     */
+    setModeSwitch()
+    {
+        this.modeRoot = document.getElementById('menu-mode')
+        const quality = this.experience.quality
+        if (!this.modeRoot || !isMobile || !quality?.auto) return
+
+        this.modeRoot.classList.remove('hidden')
+        this.modeButtons = [...this.modeRoot.querySelectorAll('[data-mode]')]
+
+        for (const button of this.modeButtons)
+        {
+            button.addEventListener('click', () =>
+            {
+                quality.choose(button.dataset.mode)
+                this.markMode()
+            })
+        }
+
+        this.markMode()
+    }
+
+    /** Which one is on, including the case where nobody has said yet. */
+    markMode()
+    {
+        const current = this.experience.quality?.mode
+        for (const button of this.modeButtons ?? [])
+        {
+            button.classList.toggle('active', button.dataset.mode === current)
+        }
     }
 
     toggle()

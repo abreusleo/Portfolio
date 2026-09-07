@@ -55,6 +55,22 @@ const GUARD = { over: 45, seconds: 4 }
 
 const STORAGE_KEY = 'basement.quality'
 
+/**
+ * The visitor's own answer, when they gave one, and the rung it starts at.
+ *
+ * The ladder below exists to guess what a phone can hold. Asked outright,
+ * somebody on a phone will say whether they came to look at the room or to get
+ * through it, which is the part the measurement cannot know: two identical
+ * handsets can want different answers.
+ *
+ * It sets where the walk starts and skips the walk. The safety net still runs
+ * on top, so choosing quality on a phone that cannot hold it drops to what it
+ * can rather than handing over a slideshow.
+ */
+const MODE_KEY = 'basement.mode'
+
+export const MODES = { quality: 0, performance: 2 }
+
 export default class Quality
 {
     constructor()
@@ -75,6 +91,13 @@ export default class Quality
         this.at = 0
         this.frames = []
         this.overSince = null
+        this.mode = this.readMode()
+    }
+
+    /** True while nobody has been asked, so the gate knows to ask. */
+    get unasked()
+    {
+        return this.auto && this.mode === null
     }
 
     get tier()
@@ -106,6 +129,17 @@ export default class Quality
         if (!this.auto) return onProgress(1)
 
         const remembered = this.read()
+
+        if (this.mode !== null)
+        {
+            // Never above where this device has already been made to settle:
+            // an answer given on a previous visit is about taste, and the
+            // safety net's answer is about what the hardware did.
+            this.at = Math.max(MODES[this.mode], remembered ?? 0)
+            this.apply()
+            return onProgress(1)
+        }
+
         if (remembered !== null)
         {
             // Already walked on this device. Walking it again every visit
@@ -183,6 +217,50 @@ export default class Quality
         this.write()
         this.frames.length = 0
         this.overSince = null
+    }
+
+    /**
+     * Takes the visitor's answer, at the moment they give it.
+     *
+     * Called from behind the loader on the way in, so the reallocation this
+     * causes happens under it rather than in the first second of the room.
+     */
+    choose(mode)
+    {
+        if (!this.auto || !(mode in MODES)) return
+
+        this.mode = mode
+        this.at = MODES[mode]
+        this.apply()
+        this.write()
+        this.writeMode()
+    }
+
+    readMode()
+    {
+        try
+        {
+            const raw = window.localStorage.getItem(MODE_KEY)
+            return raw in MODES ? raw : null
+        }
+        catch (error)
+        {
+            // Blocked storage: nobody has answered, so the gate asks. One
+            // question a visit is cheaper than a wrong guess.
+            return null
+        }
+    }
+
+    writeMode()
+    {
+        try
+        {
+            window.localStorage.setItem(MODE_KEY, this.mode)
+        }
+        catch (error)
+        {
+            // Asked again next visit, which is a question and not a fault.
+        }
     }
 
     read()

@@ -22,6 +22,16 @@ export const strings = {
     loading: { pt: 'iniciando', en: 'starting' },
     ready: { pt: 'pronto', en: 'ready' },
     enter: { pt: 'ENTRAR', en: 'ENTER' },
+
+    modeAsk: {
+        pt: 'A sala foi feita para tela grande. No celular, como você prefere ver?',
+        en: 'The room was made for a big screen. On a phone, how would you rather see it?',
+    },
+    modePerformance: { pt: 'PERFORMANCE', en: 'PERFORMANCE' },
+    modeQuality: { pt: 'QUALIDADE', en: 'QUALITY' },
+    modePerformanceHint: { pt: 'mais leve', en: 'lighter' },
+    modeQualityHint: { pt: 'mais bonita', en: 'better looking' },
+    modeSwitch: { pt: 'Imagem', en: 'Image' },
     role: { pt: 'Software Engineer Backend', en: 'Backend Software Engineer' },
 
     explore: { pt: 'EXPLORAR', en: 'EXPLORE' },
