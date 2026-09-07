@@ -2129,6 +2129,22 @@ body.no-blur #compose
     text-overflow: ellipsis;
 }
 
+/*
+ * The one line in the walk that asks for something back, on the one stop that
+ * is an invitation rather than an exhibit.
+ */
+.tour-invite
+{
+    /* A column inside the row: it belongs under the name of the place, not
+       beside it, or the controls get pushed off the end of a phone. */
+    margin-top: 0.3rem;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    color: var(--accent);
+}
+
+.tour-invite.hidden { display: none; }
+
 .tour-controls
 {
     display: flex;
@@ -2136,6 +2152,22 @@ body.no-blur #compose
     gap: 0.5rem;
     flex: none;
 }
+
+/*
+ * The last stop asks for something, so it keeps both answers instead of one,
+ * and it carries a sentence rather than a name. Three of those in a row leaves
+ * the text a word per line on a phone, so this stop alone is two rows: what it
+ * says, then what to do about it.
+ */
+#tour.tour-last
+{
+    flex-wrap: wrap;
+    width: min(34rem, calc(100% - 2rem));
+    gap: 0.9rem 1.4rem;
+}
+#tour.tour-last .tour-where { flex: 1 1 100%; }
+#tour.tour-last .tour-controls { width: 100%; justify-content: flex-end; }
+#tour.tour-last .tour-step { margin-right: auto; }
 .tour-step
 {
     font-size: 0.66rem;

@@ -126,6 +126,11 @@ export const strings = {
     tourNext: { pt: 'SEGUIR', en: 'NEXT' },
     tourSkip: { pt: 'PULAR', en: 'SKIP' },
     tourDone: { pt: 'COMEÇAR', en: 'START' },
+    tourLeave: { pt: 'DEIXAR RECADO', en: 'LEAVE A NOTE' },
+    tourInvite: {
+        pt: 'Não esqueça de deixar o seu recado!',
+        en: 'Do not go without leaving a note!',
+    },
 
     // The menu
     menuOpen: { pt: 'IR PARA', en: 'GO TO' },

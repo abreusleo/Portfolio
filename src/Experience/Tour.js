@@ -18,6 +18,10 @@ import stations from './config/stations.js'
  * things are rather than what they say. The camera walks to each place, a bar
  * names it, and reading stays the visitor's own choice — which also means the
  * tour is over the moment they press something themselves.
+ *
+ * The last stop is the exception, and deliberately so: it is the only one that
+ * asks for something rather than showing something, and an invitation whose
+ * button does not do the thing it invites is a sentence, not an offer.
  */
 
 /**
@@ -28,15 +32,18 @@ import stations from './config/stations.js'
  * and the laptop at 0.46. Left to right, the way anybody reads a wall — so
  * that is the walk, and the eye never jumps back across the room to keep up.
  *
- * The quote is the exception, held to the end. It is the one stop that is not
- * an argument, and it closes better than anything else here.
+ * Two stops are held past that order on purpose. The quote is not an argument,
+ * and it closes better than anything else here. The wall of notes is not an
+ * argument either — it is the door, and it is the only thing in the room that
+ * asks the visitor for something. Both sit at the left of the wall and neither
+ * belongs where the reading order would put them.
  *
  * The TV is absent. Every one of its six entries currently says the demo is
  * not published, and a first visit that culminates in a thing that does not
  * exist is worse than one stop shorter. It belongs back in this list on the
  * day there is a video.
  */
-const STEPS = ['products', 'prints', 'about', 'pc', 'work', 'board']
+const STEPS = ['products', 'prints', 'about', 'pc', 'work', 'board', 'notes']
 
 const STORAGE_KEY = 'basement.toured'
 
@@ -58,7 +65,9 @@ export default class Tour
         this.at = -1
         this.running = false
 
-        this.nextButton.addEventListener('click', () => this.advance())
+        this.inviteEl = document.getElementById('tour-invite')
+
+        this.nextButton.addEventListener('click', () => this.finish())
         this.skipButton.addEventListener('click', () => this.stop(true))
         locale.on('change', () => { if (this.running) this.draw() })
     }
@@ -119,8 +128,30 @@ export default class Tour
         this.stepEl.textContent = `${this.at + 1}/${STEPS.length}`
 
         const last = this.at === STEPS.length - 1
-        this.nextButton.textContent = t(last ? strings.tourDone : strings.tourNext)
-        this.skipButton.hidden = last
+        this.nextButton.textContent = t(last ? strings.tourLeave : strings.tourNext)
+
+        // Kept on the last stop rather than hidden, because there it stops
+        // being an escape and becomes the other answer to the invitation.
+        this.skipButton.textContent = t(last ? strings.tourDone : strings.tourSkip)
+        this.skipButton.hidden = false
+        this.inviteEl?.classList.toggle('hidden', !last)
+        this.root.classList.toggle('tour-last', last)
+    }
+
+    /**
+     * The primary button: one more stop, or the thing the last stop asks for.
+     *
+     * Ending here does not walk back to the overview the way every other exit
+     * does. The visitor is standing in front of the door being invited to write
+     * on it, and pulling the camera across the room in the same breath is the
+     * site taking back its own offer.
+     */
+    finish()
+    {
+        if (this.at < STEPS.length - 1) return this.advance()
+
+        this.stop(false)
+        this.experience.interactions?.openCompose()
     }
 
     /**
