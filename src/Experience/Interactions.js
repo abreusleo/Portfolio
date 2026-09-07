@@ -52,6 +52,27 @@ const GROUPS = {
     },
 }
 
+/**
+ * How much of the door is kept around the notes, and the smallest square the
+ * camera will settle for, both in metres.
+ *
+ * The floor is about six notes across. Below that the door stops being a door.
+ */
+const MARGIN = 0.075
+const MIN_NOTES = 0.45
+
+/**
+ * Room left around the fit, as a multiple of the distance it asks for.
+ *
+ * A framing that fits exactly puts the outermost note against the edge of the
+ * screen, where it reads as cut off — and the bottom of the frame is where the
+ * view switch sits. Standing back a fifth keeps both clear.
+ */
+const PAD = 1.18
+
+/** The shape the stations in this file were framed for. See Camera.fovFor. */
+const REFERENCE_ASPECT = 16 / 9
+
 const DETAILS = {
     'product.01': { proxy: 'hotspot.product.01', distance: 2.0, fov: 40, side: 0.12, group: 'products' },
     'product.02': { proxy: 'hotspot.product.02', distance: 2.0, fov: 40, side: 0.12, group: 'products' },
@@ -238,12 +259,16 @@ export default class Interactions
      * Builds a station in front of an object, aimed slightly to its right so
      * the object sits on the left and the panel has room.
      */
-    stationFor(object, { distance, fov = 38, side = 0.22, parallax = 0.08, lift = 0 })
+    stationFor(object, { distance, fov = 38, side = 0.22, parallax = 0.08, lift = 0, at = null })
     {
         const position = new THREE.Vector3()
         const quaternion = new THREE.Quaternion()
         object.getWorldPosition(position)
         object.getWorldQuaternion(quaternion)
+
+        // `at` aims at a point on the object rather than at the middle of it,
+        // for a surface whose interesting part is not in its middle.
+        if (at) position.copy(at)
 
         const normal = new THREE.Vector3(0, 0, 1).applyQuaternion(quaternion).normalize()
         const forward = normal.clone().negate()
@@ -491,6 +516,60 @@ export default class Interactions
             }
             this.beginPlacing()
         })
+    }
+
+    /**
+     * The door, framed around the notes that are actually stuck to it.
+     *
+     * The station used to be the whole door, because that is what the door is.
+     * But the door is a metre and a quarter of empty surface with, today, one
+     * note on it — and arriving at the wall unable to read the only thing on
+     * it, without knowing you may click it, is a wall that said nothing. So
+     * the framing is the notes rather than the surface they happen to be on.
+     *
+     * Never closer than MIN_NOTES across: a single note filling the frame
+     * stops being a note on a door and becomes a document, and leaning in to
+     * read one is already what clicking it does. Never wider than the door,
+     * because there is nothing out there to see. Two notes in opposite corners
+     * put it back where it started, which is the honest answer to two notes in
+     * opposite corners.
+     *
+     * Recomputed whenever the wall changes rather than held from startup: the
+     * notes arrive from the network after this class is built, and one written
+     * during the visit moves the extent again.
+     */
+    refreshNotesStation()
+    {
+        const hotspot = this.find('notes')
+        if (!hotspot) return
+
+        const meshes = this.world.notes?.meshes ?? []
+        if (meshes.length === 0)
+        {
+            hotspot.station = this.stationFor(hotspot.object, DETAILS.notes)
+            return
+        }
+
+        const box = new THREE.Box3()
+        for (const mesh of meshes) box.expandByObject(mesh)
+
+        const size = box.getSize(new THREE.Vector3())
+        const centre = box.getCenter(new THREE.Vector3())
+
+        // Enough of the door around them that they read as stuck to something.
+        const width = THREE.MathUtils.clamp(size.x + MARGIN * 2, MIN_NOTES, wall.width)
+        const height = THREE.MathUtils.clamp(size.y + MARGIN * 2, MIN_NOTES, wall.height)
+
+        // Solved against the shape the stations were authored for, not against
+        // this window: Camera.fovFor reopens the angle on a narrow screen, and
+        // a distance measured here would fight it.
+        const half = Math.tan((DETAILS.notes.fov * Math.PI) / 360)
+        const distance = Math.min(
+            DETAILS.notes.distance,
+            PAD * Math.max(height / 2 / half, width / 2 / (half * REFERENCE_ASPECT)),
+        )
+
+        hotspot.station = this.stationFor(hotspot.object, { ...DETAILS.notes, distance, at: centre })
     }
 
     /** Head-on framing of the whole door, with room to spare around it. */

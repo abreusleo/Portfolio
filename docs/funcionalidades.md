@@ -70,6 +70,7 @@ O que a sala tem para mostrar.
 | **Painel** | O texto lateral que abre ao clicar num lugar. | `InfoPanel` em `Interactions.js` · `#panel` |
 | **Dobrar o painel** | O botão que recolhe o painel para um cabeçalho, devolvendo a sala. Só no celular. A escolha vale para os painéis seguintes. | `#panel-fold` |
 | **Mural** | A porta coberta de recados. É a mesma coisa que "os recados" e que a parada `notes`. | `World/Notes.js` |
+| **Enquadramento do mural** | A estação do mural é medida a partir dos recados que estão lá, não da porta: com um só, a câmera chega perto o bastante para ler sem clicar; espalhados nas pontas, ela recua até a porta inteira. Recalculada a cada mudança da parede. | `Interactions.refreshNotesStation` |
 | **Compositor** | A caixa de escrever um recado, com o post-it que se arrasta até a porta. | `#compose` · `#place-hint` · `Interactions.beginPlacing` |
 | **Contador de pessoas** | O `● 7 na sala` na barra. Vem do backend; se ele estiver fora, o contador simplesmente não aparece. | `Presence.js` · `GET /api/online` |
 | **TV** | A televisão com as demonstrações em vídeo. | `World/Tv.js` · `#player` |

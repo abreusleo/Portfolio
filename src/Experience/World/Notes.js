@@ -343,6 +343,11 @@ export default class Notes
             this.meshes.push(mesh)
         })
 
+        // The station that frames this wall is measured from what is on it, so
+        // it has to be measured again every time that changes — the first load
+        // from the network, and every note written during a visit.
+        this.world.experience.interactions?.refreshNotesStation?.()
+
         this.rest()
     }
 }
