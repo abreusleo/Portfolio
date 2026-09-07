@@ -45,7 +45,7 @@ function experience() {
         lines.push(`${job.title}`)
         lines.push(`  ${job.company} · ${job.employment}`)
         lines.push(`  ${job.from} — ${job.to}`)
-        for (const note of job.notes) lines.push(`  · ${note}`)
+        for (const note of job.notes) lines.push(...wrap(`· ${note}`, '  ', '    '))
         lines.push('')
     }
     return lines.slice(0, -1)
@@ -57,7 +57,7 @@ function education() {
         lines.push(`${item.title}`)
         lines.push(`  ${item.school}`)
         lines.push(`  ${item.from} — ${item.to}`)
-        for (const note of item.notes) lines.push(`  · ${note}`)
+        for (const note of item.notes) lines.push(...wrap(`· ${note}`, '  ', '    '))
         lines.push('')
     }
     return lines.slice(0, -1)
@@ -67,15 +67,28 @@ function stack() {
     return Object.entries(profile.stack).map(([group, items]) => row(group, items.join(', '), 16))
 }
 
-/** Greedy wrap, so a paragraph stays inside the column the rules draw. */
-function wrap(text, indent) {
+/**
+ * Greedy wrap, so a paragraph stays inside the column the rules draw.
+ *
+ * The indent counts towards the width. It used to be added after the
+ * measuring, which let an indented paragraph run that many characters past the
+ * column it was supposed to sit in.
+ *
+ * `hang` is what the continuations line up under, so a bulleted note keeps its
+ * text in one column instead of tucking the second line under the bullet.
+ */
+function wrap(text, indent = '', hang = indent) {
     const lines = []
+    const room = Math.max(20, WIDTH - indent.length)
     let line = ''
     for (const word of String(text).split(' ')) {
-        if (line && (line + ' ' + word).length > WIDTH) { lines.push(indent + line); line = word }
+        if (line && (line + ' ' + word).length > room) {
+            lines.push((lines.length ? hang : indent) + line)
+            line = word
+        }
         else line = line ? line + ' ' + word : word
     }
-    if (line) lines.push(indent + line)
+    if (line) lines.push((lines.length ? hang : indent) + line)
     return lines
 }
 
@@ -158,7 +171,7 @@ const body = [
         row('company', profile.company),
         row('location', profile.location),
         '',
-        ...profile.summary,
+        ...profile.summary.flatMap((line) => wrap(line)),
     ]),
     section('EXPERIENCE', [...prose('work'), ...experience()]),
     section('EDUCATION', education()),
@@ -203,6 +216,7 @@ const html = `<!DOCTYPE html>
          * middle of whatever screen it lands on.
          */
         .sheet { width: fit-content; max-width: 100%; margin: 0 auto; }
+
         .banner { color: var(--accent); font-size: 11px; line-height: 1.15; margin-bottom: 1.5rem; }
         /*
          * The same capsule the room carries, in the same place, so the two
@@ -236,6 +250,29 @@ const html = `<!DOCTYPE html>
         @media (prefers-reduced-motion: reduce) {
             body.typing .ln { opacity: 1; }
         }
+        /*
+         * On a narrow screen the sheet is the thing that scrolls, not each
+         * block inside it.
+         *
+         * fit-content grows the column to its widest line, so a pre inside it
+         * is never narrower than its own text and its overflow-x never fires:
+         * the lines just spilled past the screen and were clipped, with no way
+         * to reach them. Handing the scroll to the sheet also keeps the blocks
+         * moving together, which is the only thing holding their columns of
+         * dots in line with each other.
+         *
+         * None of it can reflow — every line is monospace and aligned by
+         * hand — so the type comes down a size and the margins come in, and
+         * what is still too wide is scrolled to rather than lost.
+         */
+        @media (max-width: 760px) {
+            body { font-size: 10px; padding: 1.4rem 0.7rem 6rem; }
+            .sheet { width: 100%; overflow-x: auto; }
+            .sheet > pre { width: max-content; overflow-x: visible; }
+            /* Decoration, and the widest thing here. It can afford to be
+               smaller than the text it introduces. */
+            .banner { font-size: 7px; }
+        }
     </style>
 </head>
 <body>
@@ -247,8 +284,8 @@ ${banner}
 </pre>
 
 <pre>${escape(profile.handle)} :: machine-readable index
-<span class="dim">a plain-text mirror of this portfolio for AI agents, crawlers, and humans who prefer it raw.
-generated from the same config the 3D room reads, so the two cannot drift.</span>
+<span class="dim">${wrap('a plain-text mirror of this portfolio for AI agents, crawlers, and humans who prefer it raw.').join('\n')}
+${wrap('generated from the same config the 3D room reads, so the two cannot drift.').join(String.fromCharCode(10))}</span>
 
 ${body}</pre>
 </main>

@@ -246,12 +246,17 @@ body
 body.opening-running #hint { opacity: 0; }
 
 /*
- * And the view arrows go quiet. They sit where the card does on a phone, and
- * pressing one would both end the arrival and turn the room, which is two
- * answers to a tap that meant one.
+ * And the view arrows go quiet, for both the ways in.
+ *
+ * During the arrival they sit where the card does, and pressing one would both
+ * end it and turn the room — two answers to a tap that meant one. During the
+ * guided walk the camera is already being driven, and an arrow that turns it
+ * as well is a second hand on the wheel.
  */
 body.opening-running #view-prev,
-body.opening-running #view-next
+body.opening-running #view-next,
+body.touring #view-prev,
+body.touring #view-next
 {
     opacity: 0;
     pointer-events: none;
