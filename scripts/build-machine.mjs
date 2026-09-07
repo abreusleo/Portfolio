@@ -183,12 +183,23 @@ const html = `<!DOCTYPE html>
     <title>Machine view — ${escape(profile.name)}</title>
     <meta name="description" content="Plain-text mirror of ${escape(profile.name)}'s portfolio for AI agents, crawlers and humans who prefer it raw.">
     <style>
-        :root { --bg: #07080c; --fg: #d7dbe3; --dim: #6f7482; --accent: #3dff74; }
+        :root { --bg: #07080c; --fg: #d7dbe3; --dim: #6f7482; --accent: #ff8a3d; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { background: var(--bg); color: var(--fg); }
         /* The last of the text has to clear the capsule parked over it. */
         body { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; line-height: 1.5; padding: 2rem 1.5rem 6rem; }
         pre { white-space: pre; overflow-x: auto; }
+
+        /*
+         * The column is centred; the text inside it is not.
+         *
+         * Every line here is set in a monospace and aligned to a column of
+         * dots, so centring the lines themselves would break the one thing
+         * holding them together. What is centred is the block: fit-content
+         * takes the width of the widest line, and the margins put that in the
+         * middle of whatever screen it lands on.
+         */
+        .sheet { width: fit-content; max-width: 100%; margin: 0 auto; }
         .banner { color: var(--accent); font-size: 11px; line-height: 1.15; margin-bottom: 1.5rem; }
         /*
          * The same capsule the room carries, in the same place, so the two
@@ -227,6 +238,7 @@ const html = `<!DOCTYPE html>
 <body>
     <div class="switch"><a href="./">HUMAN</a><span class="active">MACHINE</span></div>
 
+<main class="sheet">
 <pre class="banner">
 ${banner}
 </pre>
@@ -236,6 +248,7 @@ ${banner}
 generated from the same config the 3D room reads, so the two cannot drift.</span>
 
 ${body}</pre>
+</main>
 
 <script>
 /*
@@ -266,8 +279,8 @@ ${body}</pre>
 
     document.body.className += ' typing';
 
-    var BUDGET = 1500;
-    var step = Math.max(3, Math.min(11, BUDGET / lines.length));
+    var BUDGET = 2400;
+    var step = Math.max(4, Math.min(17, BUDGET / lines.length));
     var at = 0;
     var last = 0;
 

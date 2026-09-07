@@ -603,7 +603,8 @@ export default class Interactions
      */
     applyCursor()
     {
-        const wanted = (this.hovered || this.hoveredNote || this.hoveredEgg) ? 'pointer' : 'default'
+        const over = this.guided ? null : (this.hovered || this.hoveredNote || this.hoveredEgg)
+        const wanted = over ? 'pointer' : 'default'
         if (wanted === this.cursor) return
 
         this.cursor = wanted
@@ -969,20 +970,43 @@ export default class Interactions
         if (hotspot !== this.hovered)
         {
             this.hovered = hotspot
-
-            // The bracket replaces the trailing label for the places, and only
-            // where there is a pointer to answer. Notes and eggs keep the label
-            // that follows the cursor: one is a scrap of paper too small to
-            // bracket, the other is never announced at all.
-            if (hotspot && !this.touching) this.frame.show(hotspot)
-            else this.frame.hide()
-
             this.tooltip.textContent = ''
             this.tooltip.classList.add('hidden')
         }
 
-        if (this.hovered) this.frame.update()
+        // The bracket replaces the trailing label for the places, and only
+        // where there is a pointer to answer. Notes and eggs keep the label
+        // that follows the cursor: one is a scrap of paper too small to
+        // bracket, the other is never announced at all.
+        //
+        // Decided against what is on screen rather than against what changed,
+        // so it also appears the moment the walk ends over something the
+        // pointer was already resting on.
+        const framed = (this.touching || this.guided) ? null : hotspot
+        if (framed !== this.frame.hotspot)
+        {
+            if (framed) this.frame.show(framed)
+            else this.frame.hide()
+        }
+
+        if (this.frame.hotspot) this.frame.update()
         this.applyCursor()
+    }
+
+    /**
+     * True while the room is walking the visitor somewhere.
+     *
+     * The guided walk is the one time the room is presenting itself, and the
+     * bracket answers the pointer instead: it opens over whatever the cursor
+     * happened to be left on, slides off it as the camera travels, and prints
+     * a second copy of the name the walk's own bar is already showing.
+     *
+     * It stops the drawing and not the pressing. Touching the room is how the
+     * walk is ended, and a room that stopped answering would take that away.
+     */
+    get guided()
+    {
+        return !!this.experience.ui?.tour?.running
     }
 
     moveTooltip()
