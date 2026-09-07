@@ -24,3 +24,13 @@ legendas impressas na cena, o machine view e o `llms.txt`. Ela é a irmã da COP
 RULE que já está no topo de `src/Experience/config/projects.js` — aquela diz
 para falar do propósito e não da construção; esta diz que a parte da construção
 que protege alguma coisa não é nem opcional, é proibida.
+
+## Como as funcionalidades se chamam
+
+`docs/funcionalidades.md` dá nome a cada peça do site — o portão, a abertura, o
+colchete, as setas de vista, a escada de qualidade — e diz onde cada uma mora no
+código. É o vocabulário que usamos para apontar um problema sem descrevê-lo.
+
+Leia antes de mexer em qualquer coisa da interface, e atualize quando algo
+nascer, mudar de nome ou sair. Um nome que não corresponde mais ao que está na
+tela é pior que nenhum nome: manda a conversa para o lugar errado com confiança.
