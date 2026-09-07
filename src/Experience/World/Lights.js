@@ -27,6 +27,8 @@ export default class Lights
             wash: 7 * mul,
             bias: 2.4,
             underDesk: 1.6,
+            accentWall: 4.2 * mul,
+            accentDesk: 2.6,
         }
 
         this.group = new THREE.Group()
@@ -42,6 +44,7 @@ export default class Lights
         ]
 
         this.createTrack()
+        this.createAccents()
         this.createBias()
         this.createUnderDesk()
 
@@ -122,6 +125,74 @@ export default class Lights
         this.group.add(this.shelfWash.target)
     }
 
+    /**
+     * A fixture over each of the things worth walking to.
+     *
+     * The room already picked two of them out and nothing else: a grazing spot
+     * over the product shelves, and the lamp on the work desk. Both read as the
+     * room being lit rather than as a marker drawn on it, which is the thing
+     * three attempts at an overlay never managed — so the rest are lit the same
+     * way instead, by the same two kinds of fixture.
+     *
+     * On the wall, a spot mounted just under the ceiling and half a metre out,
+     * angled back into the surface: the same shape the track already throws on
+     * the far wall. On the counter, a short warm pool with a fast falloff, like
+     * the desk lamp two metres to its right.
+     *
+     * None of them cast shadows. Neither does the shelf wash they copy: nine
+     * lights in a room and one shadow map is what holds the frame budget, and
+     * a grazing light on a flat wall has almost nothing to cast anyway.
+     *
+     * The television is not here. It is a screen, it makes its own light, and
+     * washing a lit screen with a lamp is how a screen stops being readable.
+     */
+    createAccents()
+    {
+        const { height: H } = room
+
+        // Mount and aim. A spot with decay is brightest where it starts, not
+        // where it is pointed, so the two that hang over shorter objects are
+        // mounted lower and aimed lower than the ceiling ones: pointed at the
+        // middle from the ceiling, the pool lands on the wall above the thing.
+        this.accents = {
+            // The framed wall, from just under the ceiling.
+            prints: this.wallWash([1.62, H - 0.12, -2.42], [1.62, 2.05, -2.98]),
+            // The door the notes are stuck to. Aimed at its upper half rather
+            // than its middle: the door itself is black and returns almost
+            // nothing, so what this is really lighting is the plaster around
+            // it and the paper stuck to it — and the paper is the point.
+            notes: this.wallWash([-2.58, 2.72, -2.36], [-2.58, 1.7, -2.95]),
+            // The quote, on the right-hand wall, out of the track's reach: the
+            // heads up there are aimed at the far end and always were.
+            board: this.wallWash([3.02, 2.56, -1.98], [3.45, 1.45, -1.98]),
+            // And the shelf of souvenirs, which is on a counter rather than a
+            // wall, so it gets the lamp's kind of light and not the ceiling's.
+            about: this.deskPool([-0.55, 1.62, -2.05], [-0.55, 0.9, -2.45]),
+        }
+    }
+
+    /** A ceiling spot grazing a wall, in the shelf wash's own terms. */
+    wallWash(at, aim)
+    {
+        const light = new THREE.SpotLight(this.theme.lightWarm, this.params.accentWall, 5, 0.72, 0.95, 1.4)
+        light.position.set(...at)
+        light.target.position.set(...aim)
+        this.group.add(light)
+        this.group.add(light.target)
+        return light
+    }
+
+    /** A short warm pool over a surface, in the desk lamp's own terms. */
+    deskPool(at, aim)
+    {
+        const light = new THREE.SpotLight(this.theme.lightWarm, this.params.accentDesk, 2.2, 0.8, 0.6, 2)
+        light.position.set(...at)
+        light.target.position.set(...aim)
+        this.group.add(light)
+        this.group.add(light.target)
+        return light
+    }
+
     /** Warm bias light behind the main monitor, bouncing off the slat wall. */
     createBias()
     {
@@ -149,6 +220,11 @@ export default class Lights
         f.add(this.params, 'bar').min(0).max(20).step(0.1).name('Linear bars').onChange((v) => { for (const b of this.bars) b.rect.intensity = v })
         f.add(this.params, 'barSpot').min(0).max(40).step(0.1).name('Bar spot').onChange((v) => { for (const b of this.bars) if (b.spot) b.spot.intensity = v })
         f.add(this.params, 'wash').min(0).max(30).step(0.1).name('Wall wash').onChange((v) => { this.wash.intensity = v })
+        f.add(this.params, 'accentWall').min(0).max(20).step(0.1).name('Accent walls').onChange((v) =>
+        {
+            for (const id of ['prints', 'notes', 'board']) this.accents[id].intensity = v
+        })
+        f.add(this.params, 'accentDesk').min(0).max(12).step(0.1).name('Accent counter').onChange((v) => { this.accents.about.intensity = v })
         f.add(this.params, 'bias').min(0).max(10).step(0.1).name('Monitor bias').onChange((v) => { this.bias.intensity = v })
         f.add(this.params, 'underDesk').min(0).max(6).step(0.1).name('Under desk').onChange((v) => { this.underDesk.intensity = v })
     }

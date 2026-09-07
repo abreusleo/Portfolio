@@ -53,6 +53,17 @@ const SAMPLES = 24
 /** Long enough to be throttling rather than one bad second. */
 const GUARD = { over: 45, seconds: 4 }
 
+/**
+ * Past this, in milliseconds, it was not a slow frame.
+ *
+ * It was a stall: the tab went to the background, the machine slept, the
+ * browser was busy elsewhere. Those gaps are not the cost of drawing the room
+ * and counting them demotes somebody for switching tabs — which is exactly
+ * what happened, ten times in a row, the moment the net started measuring a
+ * room instead of a page load.
+ */
+const STALL = 250
+
 const STORAGE_KEY = 'basement.quality'
 
 /**
@@ -92,6 +103,34 @@ export default class Quality
         this.frames = []
         this.overSince = null
         this.mode = this.readMode()
+
+        // The net below stays off until the room is handed over. Left running
+        // from the first tick it spends the whole load measuring the load —
+        // prewarm, the ladder, the building of the room — decides the device
+        // is over budget while nobody is looking, and then drops a rung in the
+        // first second of the room. Which lands on the visitor as the answer
+        // to the question at the door being overruled before they saw it.
+        this.armed = false
+    }
+
+    /** The room is on screen and steady. Whatever it costs now is the truth. */
+    arm()
+    {
+        this.frames.length = 0
+        this.overSince = null
+        this.armed = true
+
+        // And again every time the tab comes back. Waking rebuilds the render
+        // targets the hidden tab gave up, and the frames that reallocation
+        // costs are the price of having come back, not the price of the room.
+        if (this.watching) return
+        this.watching = true
+        document.addEventListener('visibilitychange', () =>
+        {
+            if (document.visibilityState !== 'visible') return
+            this.frames.length = 0
+            this.overSince = null
+        })
     }
 
     /** True while nobody has been asked, so the gate knows to ask. */
@@ -193,9 +232,20 @@ export default class Quality
      */
     update(delta)
     {
-        if (!this.auto || this.at >= TIERS.length - 1) return
+        if (!this.armed || !this.auto || this.at >= TIERS.length - 1) return
 
-        this.frames.push(delta * 1000)
+        const ms = delta * 1000
+
+        // A stall also breaks the window it lands in: half of it was measured
+        // before the gap and half after, and nothing in between was drawn.
+        if (ms > STALL)
+        {
+            this.frames.length = 0
+            this.overSince = null
+            return
+        }
+
+        this.frames.push(ms)
         if (this.frames.length > 120) this.frames.shift()
         if (this.frames.length < 60) return
 

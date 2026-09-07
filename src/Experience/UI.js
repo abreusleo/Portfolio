@@ -372,6 +372,10 @@ export default class UI
             // After the arrival, not during it: a bar appearing over a camera
             // still moving reads as part of the loading rather than as an offer.
             if (!instant) this.tour?.start()
+
+            // And the frame budget starts being judged here, on a room that is
+            // standing still, rather than on the work of building it.
+            this.experience.quality.arm()
         })
         this.experience.renderer.reveal(instant ? 0 : 2.6)
     }
