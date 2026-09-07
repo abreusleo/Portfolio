@@ -422,9 +422,16 @@ body.opening-running #view-next
     top: 0;
     left: 0;
     right: 0;
-    height: 3.15rem;
-    background: linear-gradient(rgba(9, 10, 12, 0.82), rgba(9, 10, 12, 0.55));
-    border-bottom: 1px solid rgba(233, 231, 227, 0.10);
+    height: 2.9rem;
+    /*
+     * A rule, not a slab. The room is already made of horizontal lines — the
+     * two LED bars, the shelves, the lip of the desk — and a line reads as one
+     * more of them where a panel of chrome reads as a browser sitting on top
+     * of the room. The fill is only as much as the type needs to be legible
+     * against a ceiling that is sometimes lit.
+     */
+    background: rgba(9, 10, 12, 0.66);
+    border-bottom: 1px solid rgba(233, 231, 227, 0.09);
     pointer-events: none;
 }
 
@@ -442,6 +449,22 @@ body.opening-running #view-next
 
 .hud-tl { left: 0; }
 .hud-tr { right: 0; }
+
+/*
+ * Three things live on the right — how many people are here, which view, which
+ * language — and set in one row at one weight they read as a single run-on
+ * string. A hairline between them says there are three.
+ */
+body:not(.mobile) #hud > .hud-tl > .menu-open,
+body:not(.mobile) #hud > .hud-tr > * + *
+{
+    border-left: 1px solid rgba(233, 231, 227, 0.14);
+    padding-left: 1.15rem;
+}
+
+body:not(.mobile) #hud > .hud-tl,
+body:not(.mobile) #hud > .hud-tr { gap: 1.15rem; }
+body:not(.mobile) #hud .lang-toggle { margin-top: 0; }
 
 /*
  * A bar needs a width to be a bar. Three hundred and ninety pixels is not one:
@@ -482,13 +505,14 @@ body.mobile .online { justify-content: flex-end; margin-bottom: 0.35rem; }
 
 .online #online-count { color: var(--fg); }
 
+/* The one warm point in the strip, and the only thing in it that is live. */
 .online-dot
 {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
     border-radius: 50%;
-    background: #4ade80;
-    box-shadow: 0 0 8px rgba(74, 222, 128, 0.7);
+    background: var(--accent);
+    box-shadow: 0 0 7px rgba(255, 138, 61, 0.55);
 }
 .hud-bl { bottom: 0; left: 0; }
 .hud-br { bottom: 0; right: 0; }
@@ -505,15 +529,26 @@ body.mobile .online { justify-content: flex-end; margin-bottom: 0.35rem; }
     margin-left: 0.6rem;
 }
 
-.mode-toggle span.active
+/*
+ * State by brightness, not by colour.
+ *
+ * Both switches used to mark their live half in the accent, so the strip had
+ * two warm highlights meaning "you are here" and a third, in a green found
+ * nowhere else on the site, meaning "somebody is here". Three highlights, three
+ * different meanings, all shouting at once. The accent is spent on the one
+ * thing in the bar that is actually live, and these say it by being brighter
+ * than the half that is not.
+ */
+.mode-toggle
 {
-    color: var(--accent);
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
 }
 
-.mode-toggle .sep
+.mode-toggle span.active
 {
-    color: var(--dim);
-    margin: 0 0.5rem;
+    color: var(--fg);
 }
 
 .mode-toggle a
@@ -801,7 +836,7 @@ body.mobile #hotspot-frame { display: none; }
 {
     display: flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.75rem;
     justify-content: flex-end;
     margin-top: 0.35rem;
     font-size: 0.68rem;
@@ -827,7 +862,7 @@ body.mobile #hotspot-frame { display: none; }
 
 .lang-toggle button.active
 {
-    color: var(--accent);
+    color: var(--fg);
 }
 
 .lang-toggle button:focus-visible
@@ -1814,6 +1849,19 @@ body.mobile #hotspot-frame { display: none; }
     transition: border-color 0.2s ease, color 0.2s ease;
 }
 .menu-open:hover { border-color: var(--accent); color: var(--accent); }
+
+/*
+ * On the bar it loses the box. It was the only bordered object in a strip made
+ * of bare type, which made the least important thing in it the heaviest.
+ */
+body:not(.mobile) .menu-open
+{
+    padding: 0;
+    background: none;
+    border: 0;
+}
+
+body:not(.mobile) .menu-open:hover { color: var(--accent); }
 
 .menu-bars { display: flex; flex-direction: column; gap: 3px; width: 13px; }
 .menu-bars i { display: block; height: 1.5px; background: currentColor; }
