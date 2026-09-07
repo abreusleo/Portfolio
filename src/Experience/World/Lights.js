@@ -143,8 +143,18 @@ export default class Lights
      * lights in a room and one shadow map is what holds the frame budget, and
      * a grazing light on a flat wall has almost nothing to cast anyway.
      *
-     * The television is not here. It is a screen, it makes its own light, and
+     * Two things are not here, for the same reason twice over.
+     *
+     * The television, because it is a screen: it makes its own light, and
      * washing a lit screen with a lamp is how a screen stops being readable.
+     *
+     * And the glass board, which turned out to be the same mistake in slower
+     * motion. It already had a picture light of its own, so this was a second
+     * lamp on one object, and what the second lamp lit was the handwriting —
+     * a drawn line survives on contrast, and adding light to both the ink and
+     * the board underneath it takes exactly that away. It is also the one
+     * place the room deliberately does not advertise (see OMIT in Menu.js), so
+     * picking it out with a fixture argued against the room.
      */
     createAccents()
     {
@@ -156,15 +166,20 @@ export default class Lights
         // middle from the ceiling, the pool lands on the wall above the thing.
         this.accents = {
             // The framed wall, from just under the ceiling.
-            prints: this.wallWash([1.62, H - 0.12, -2.42], [1.62, 2.05, -2.98]),
+            //
+            // Two heads, not one. The wall is two metres and ten of frames and
+            // a single cone reached about half of it, so the outer two columns
+            // sat in the penumbra while the middle one was picked out — which
+            // says "look at these two" about a wall of six. Two is also what
+            // the room already does with art: the track on the far wall has
+            // three.
+            printsLeft: this.wallWash([1.05, H - 0.12, -2.42], [1.05, 2.05, -2.98]),
+            printsRight: this.wallWash([2.2, H - 0.12, -2.42], [2.2, 2.05, -2.98]),
             // The door the notes are stuck to. Aimed at its upper half rather
             // than its middle: the door itself is black and returns almost
             // nothing, so what this is really lighting is the plaster around
             // it and the paper stuck to it — and the paper is the point.
             notes: this.wallWash([-2.58, 2.72, -2.36], [-2.58, 1.7, -2.95]),
-            // The quote, on the right-hand wall, out of the track's reach: the
-            // heads up there are aimed at the far end and always were.
-            board: this.wallWash([3.02, 2.56, -1.98], [3.45, 1.45, -1.98]),
             // And the shelf of souvenirs, which is on a counter rather than a
             // wall, so it gets the lamp's kind of light and not the ceiling's.
             about: this.deskPool([-0.55, 1.62, -2.05], [-0.55, 0.9, -2.45]),
@@ -222,7 +237,7 @@ export default class Lights
         f.add(this.params, 'wash').min(0).max(30).step(0.1).name('Wall wash').onChange((v) => { this.wash.intensity = v })
         f.add(this.params, 'accentWall').min(0).max(20).step(0.1).name('Accent walls').onChange((v) =>
         {
-            for (const id of ['prints', 'notes', 'board']) this.accents[id].intensity = v
+            for (const id of ['printsLeft', 'printsRight', 'notes']) this.accents[id].intensity = v
         })
         f.add(this.params, 'accentDesk').min(0).max(12).step(0.1).name('Accent counter').onChange((v) => { this.accents.about.intensity = v })
         f.add(this.params, 'bias').min(0).max(10).step(0.1).name('Monitor bias').onChange((v) => { this.bias.intensity = v })
