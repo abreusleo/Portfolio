@@ -186,14 +186,24 @@ const html = `<!DOCTYPE html>
         :root { --bg: #07080c; --fg: #d7dbe3; --dim: #6f7482; --accent: #3dff74; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { background: var(--bg); color: var(--fg); }
-        body { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; line-height: 1.5; padding: 2rem 1.5rem 4rem; }
+        /* The last of the text has to clear the capsule parked over it. */
+        body { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; line-height: 1.5; padding: 2rem 1.5rem 6rem; }
         pre { white-space: pre; overflow-x: auto; }
         .banner { color: var(--accent); font-size: 11px; line-height: 1.15; margin-bottom: 1.5rem; }
-        .toggle { position: fixed; top: 1rem; right: 1.2rem; font-size: 0.72rem; letter-spacing: 0.14em; }
-        .toggle a { color: var(--dim); text-decoration: none; }
-        .toggle a:hover { color: var(--fg); }
-        .toggle .active { color: var(--accent); }
-        .toggle .sep { color: var(--dim); margin: 0 0.5rem; }
+        /*
+         * The same capsule the room carries, in the same place, so the two
+         * halves of this portfolio are one control seen from either side. It
+         * wears this page's own accent rather than the room's: the switch
+         * belongs to whichever side is showing.
+         */
+        .switch { position: fixed; left: 50%; bottom: 1.4rem; transform: translateX(-50%);
+                  display: inline-flex; align-items: center; padding: 0.34rem;
+                  background: rgba(4, 5, 8, 0.94); border: 1px solid rgba(215, 219, 227, 0.16);
+                  border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.14em; }
+        .switch > * { padding: 0.28rem 1.15rem; border-radius: 999px; }
+        .switch a { color: var(--fg); text-decoration: none; transition: background 0.2s, color 0.2s; }
+        .switch a:hover { background: rgba(215, 219, 227, 0.09); }
+        .switch .active { color: var(--accent); }
         .dim { color: var(--dim); }
         a { color: var(--fg); }
 
@@ -215,7 +225,7 @@ const html = `<!DOCTYPE html>
     </style>
 </head>
 <body>
-    <div class="toggle"><a href="./">HUMAN</a><span class="sep">/</span><span class="active">MACHINE</span></div>
+    <div class="switch"><a href="./">HUMAN</a><span class="active">MACHINE</span></div>
 
 <pre class="banner">
 ${banner}

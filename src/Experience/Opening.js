@@ -92,8 +92,29 @@ export default class Opening
         this.remember()
         this.listen()
 
+        // The room stops answering the pointer for the length of the move.
+        //
+        // Everything the pointer does here is wrong while the camera is
+        // crossing the room: the hatched patch appears over whatever the
+        // cursor happens to be resting on and then slides off it, the cursor
+        // itself turns into a hand for something nobody is aiming at, and the
+        // click that was meant to end the arrival opens a panel on the way
+        // past. One flag closes all three, because it is the flag all three
+        // already read.
+        this.experience.interactions.enabled = false
+
         this.show()
-        return this.camera.flyThrough(PATH, DURATION).then(() => this.done())
+
+        // Resolved by whichever ending happens, not by the tween.
+        //
+        // Skipping kills the tween, and a killed gsap tween never calls its
+        // onComplete — so the promise the arrival hands back never settled,
+        // and everything waiting on it silently did not happen: the guided
+        // walk was never offered, and the frame-budget net was never armed.
+        // Anybody who pressed to get past the way in lost both.
+        const ended = new Promise((resolve) => { this.finish = resolve })
+        this.camera.flyThrough(PATH, DURATION).then(() => this.done())
+        return ended
     }
 
     /**
@@ -129,7 +150,15 @@ export default class Opening
 
         window.removeEventListener('pointerdown', this.skip)
         window.removeEventListener('keydown', this.onKey)
+
+        // Cleared as well as re-opened: the pointer may have come to rest on
+        // something during the move, and the room should notice it now rather
+        // than on the next time the hand happens to twitch.
+        this.experience.interactions.enabled = true
+        this.experience.interactions.clearHover()
+
         this.hide()
+        this.finish?.()
     }
 
     show()
