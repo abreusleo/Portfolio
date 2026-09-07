@@ -621,6 +621,7 @@ body.mobile #hud > .hud-tr { text-align: right; }
 body.mobile .online,
 body.mobile .lang-picker,
 body.mobile .eggs { justify-content: flex-end; }
+body.mobile .eggs { margin-top: 0.7rem; }
 
 /*
  * Which view, which language: the pair somebody sets once and then forgets.
@@ -760,7 +761,6 @@ body:not(.mobile) [data-mobile] { display: none; }
     align-items: center;
     justify-content: flex-end;
     gap: 0.4rem;
-    margin-top: 0.7rem;
     color: var(--accent);
     font-size: 0.72rem;
     font-weight: 700;
