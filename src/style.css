@@ -551,6 +551,66 @@ body:not(.mobile) [data-mobile] { display: none; }
     transition-delay: 0s;
 }
 
+/*
+ * The bracket around whatever the pointer is on.
+ *
+ * Hatched rather than filled: a solid panel over an object hides the object,
+ * and the object is the thing being pointed at. The stripes read as a marked
+ * region while leaving it visible straight through.
+ *
+ * It never takes a pointer event of its own. It sits exactly on top of the
+ * thing it is bracketing, and the click has to reach the canvas underneath.
+ */
+#hotspot-frame
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 24;
+    pointer-events: none;
+    border: 1px solid rgba(233, 231, 227, 0.42);
+    background: repeating-linear-gradient(
+        -45deg,
+        rgba(233, 231, 227, 0.10) 0 2px,
+        transparent 2px 8px
+    );
+    transition: opacity 0.16s ease, visibility 0s linear 0.16s;
+}
+
+#hotspot-frame:not(.hidden) { transition-delay: 0s; }
+
+/* Outside the bracket and vertically centred on it, the way a caption sits
+   beside a plate rather than on it. */
+.hotspot-frame-label
+{
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translate(0.85rem, -50%);
+    color: var(--fg);
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9);
+}
+
+/* The brackets are typed here rather than into the translations: they are
+   punctuation belonging to this treatment, not to the words. */
+.hotspot-frame-label::before { content: '['; margin-right: 0.15em; }
+.hotspot-frame-label::after { content: ']'; margin-left: 0.15em; }
+
+/* Against the right edge the caption swaps sides instead of leaving the screen. */
+#hotspot-frame.flip .hotspot-frame-label
+{
+    left: auto;
+    right: 100%;
+    transform: translate(-0.85rem, -50%);
+}
+
+/* No pointer, no bracket. A phone would have it stuck on whatever was tapped
+   last, which is the bug the trailing labels already had there. */
+body.mobile #hotspot-frame { display: none; }
+
 /* ------------------------------------------------------------------ */
 /* Info panel                                                          */
 /* ------------------------------------------------------------------ */

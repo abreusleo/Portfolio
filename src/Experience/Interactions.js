@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 
 import Experience from './Experience.js'
+import HoverFrame from './HoverFrame.js'
 import stations from './config/stations.js'
 import videos from './config/videos.js'
 import content from './config/content.js'
@@ -123,6 +124,7 @@ export default class Interactions
         this.desktopStage = document.getElementById('desktop-stage')
         document.getElementById('desktop-exit').addEventListener('click', () => this.close())
         this.tooltip = document.getElementById('hotspot-label')
+        this.frame = new HoverFrame()
 
         this.setEvents()
 
@@ -888,6 +890,7 @@ export default class Interactions
     {
         this.hovered = null
         this.hoveredNote = null
+        this.frame?.hide()
         this.tooltip.classList.add('hidden')
         this.applyCursor()
     }
@@ -966,11 +969,19 @@ export default class Interactions
         if (hotspot !== this.hovered)
         {
             this.hovered = hotspot
-            this.tooltip.textContent = hotspot && !this.touching ? t(hotspot.label) : ''
-            this.tooltip.classList.toggle('hidden', !hotspot || this.touching)
+
+            // The bracket replaces the trailing label for the places, and only
+            // where there is a pointer to answer. Notes and eggs keep the label
+            // that follows the cursor: one is a scrap of paper too small to
+            // bracket, the other is never announced at all.
+            if (hotspot && !this.touching) this.frame.show(hotspot)
+            else this.frame.hide()
+
+            this.tooltip.textContent = ''
+            this.tooltip.classList.add('hidden')
         }
 
-        if (this.hovered) this.moveTooltip()
+        if (this.hovered) this.frame.update()
         this.applyCursor()
     }
 
