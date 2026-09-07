@@ -44,11 +44,29 @@ const _towards = new THREE.Vector3()
 const _anchor = new THREE.Vector3()
 const _basis = new THREE.Matrix4()
 
-/** Grown past the object, in metres, so it brackets rather than covers. */
-const PAD = 0.07
-
-/** Clear of the surface, so it never fights the thing it is marking. */
-const LIFT = 0.012
+/**
+ * Everything about how this looks, in one place, in the units it is measured
+ * in. Every one of them is on a slider at `#debug`, and the shader reads them
+ * as uniforms rather than constants so a slider can move them while the patch
+ * is on screen — a `#define` would need the shader recompiled to change.
+ */
+const LOOK = {
+    /** Grown past the object, in metres, so it brackets rather than covers. */
+    pad: 0.07,
+    /** Clear of the surface, so it never fights the thing it is marking. */
+    lift: 0.012,
+    /** Distance between stripes, in metres on the surface. */
+    pitch: 0.055,
+    /** How much of that distance is stripe rather than gap, 0 to 1. */
+    duty: 0.34,
+    /** Weight of the hairline round the edge, in metres. */
+    border: 0.008,
+    /** How strong the stripes and the edge are, each 0 to 1. */
+    hatch: 0.13,
+    edge: 0.5,
+    /** How much of the accent the edge takes, 0 to 1. */
+    tint: 0.35,
+}
 
 export default class HoverFrame
 {
@@ -60,6 +78,11 @@ export default class HoverFrame
 
         this.labelEl = document.getElementById('hotspot-frame-label')
         this.hotspot = null
+
+        // Copied rather than read straight from LOOK, so the sliders write
+        // here and the defaults above stay the defaults.
+        this.look = { ...LOOK }
+        this.pinned = false
 
         this.material = new THREE.ShaderMaterial({
             transparent: true,
@@ -74,6 +97,12 @@ export default class HoverFrame
                 uAccent: { value: new THREE.Color(this.theme.accent) },
                 uSize: { value: new THREE.Vector2(1, 1) },
                 uOpacity: { value: 0 },
+                uPitch: { value: LOOK.pitch },
+                uDuty: { value: LOOK.duty },
+                uBorder: { value: LOOK.border },
+                uHatch: { value: LOOK.hatch },
+                uEdge: { value: LOOK.edge },
+                uTint: { value: LOOK.tint },
             },
             vertexShader: /* glsl */`
                 varying vec2 vUv;
@@ -88,12 +117,13 @@ export default class HoverFrame
                 uniform vec3 uAccent;
                 uniform vec2 uSize;
                 uniform float uOpacity;
+                uniform float uPitch;
+                uniform float uDuty;
+                uniform float uBorder;
+                uniform float uHatch;
+                uniform float uEdge;
+                uniform float uTint;
                 varying vec2 vUv;
-
-                /** Stripe pitch and border weight, both in metres. */
-                #define PITCH 0.055
-                #define DUTY 0.34
-                #define BORDER 0.008
 
                 void main()
                 {
@@ -101,20 +131,20 @@ export default class HoverFrame
                     // the hatch belong to the wall instead of to the screen.
                     vec2 p = vUv * uSize;
 
-                    float band = fract((p.x + p.y) / PITCH);
+                    float band = fract((p.x + p.y) / uPitch);
                     float w = max(fwidth(band), 0.001);
-                    float hatch = 1.0 - smoothstep(DUTY - w, DUTY + w, band);
+                    float hatch = 1.0 - smoothstep(uDuty - w, uDuty + w, band);
 
                     // A hairline round the edge, also measured in metres, so it
                     // stays a hairline on a wall two metres wide.
                     vec2 e = min(vUv, 1.0 - vUv) * uSize;
                     float d = min(e.x, e.y);
-                    float edge = 1.0 - smoothstep(BORDER, BORDER + fwidth(d), d);
+                    float edge = 1.0 - smoothstep(uBorder, uBorder + fwidth(d), d);
 
-                    float a = max(hatch * 0.13, edge * 0.5) * uOpacity;
+                    float a = max(hatch * uHatch, edge * uEdge) * uOpacity;
                     if (a < 0.004) discard;
 
-                    gl_FragColor = vec4(mix(uColor, uAccent, edge * 0.35), a);
+                    gl_FragColor = vec4(mix(uColor, uAccent, edge * uTint), a);
                 }
             `,
         })
@@ -126,6 +156,49 @@ export default class HoverFrame
         this.mesh.raycast = () => {}
         this.mesh.visible = false
         this.experience.scene.add(this.mesh)
+
+        this.setDebug()
+    }
+
+    /**
+     * Sliders for every number above, at `#debug`.
+     *
+     * Reading a value off a screenshot and typing it back into a file is a
+     * slow way to answer "is that too strong": this answers it while looking
+     * at it. Nothing here exists outside `#debug`.
+     */
+    setDebug()
+    {
+        const debug = this.experience.debug
+        if (!debug.active) return
+
+        const f = debug.ui.addFolder('Hover frame')
+        const u = this.material.uniforms
+        const bind = (key, min, max, step, name, uniform) =>
+            f.add(this.look, key).min(min).max(max).step(step).name(name)
+                .onChange((v) => { if (uniform) u[uniform].value = v })
+
+        f.add(this, 'pinned').name('Fixar no ultimo')
+        bind('pad', 0, 0.3, 0.005, 'Folga (m)')
+        bind('lift', 0, 0.05, 0.001, 'Afastamento (m)')
+        bind('pitch', 0.015, 0.16, 0.001, 'Passo da hachura (m)', 'uPitch')
+        bind('duty', 0.05, 0.9, 0.01, 'Espessura da listra', 'uDuty')
+        bind('border', 0.001, 0.03, 0.0005, 'Fio da borda (m)', 'uBorder')
+        bind('hatch', 0, 0.6, 0.005, 'Forca da hachura', 'uHatch')
+        bind('edge', 0, 1, 0.01, 'Forca da borda', 'uEdge')
+        bind('tint', 0, 1, 0.01, 'Accent na borda', 'uTint')
+
+        // Prints them in the shape they are written in the file, so a good set
+        // goes back into LOOK without being transcribed by hand.
+        f.add({
+            copiar: () =>
+            {
+                const out = Object.entries(this.look)
+                    .map(([k, v]) => `    ${k}: ${Number(v.toFixed(4))},`)
+                    .join('\n')
+                console.log(`const LOOK = {\n${out}\n}`)
+            },
+        }, 'copiar').name('Imprimir no console')
     }
 
     show(hotspot)
@@ -144,6 +217,11 @@ export default class HoverFrame
 
     hide()
     {
+        // Pinned, it stays on the last thing it was on. Reaching a slider means
+        // taking the pointer off the room, which would otherwise put away the
+        // very thing being adjusted.
+        if (this.pinned) return
+
         this.hotspot = null
         this.mesh.visible = false
         this.labelEl?.parentElement?.classList.add('hidden')
@@ -190,12 +268,12 @@ export default class HoverFrame
         // way on half the room.
         _side.crossVectors(_up, _normal).normalize()
 
-        const width = metres(upIsB ? a : b) + PAD * 2
-        const height = metres(upIsB ? b : a) + PAD * 2
+        const width = metres(upIsB ? a : b) + this.look.pad * 2
+        const height = metres(upIsB ? b : a) + this.look.pad * 2
 
         _basis.makeBasis(_side, _up, _normal)
         this.mesh.quaternion.setFromRotationMatrix(_basis)
-        this.mesh.position.copy(_centre).addScaledVector(_normal, LIFT)
+        this.mesh.position.copy(_centre).addScaledVector(_normal, this.look.lift)
         this.mesh.scale.set(width, height, 1)
         this.material.uniforms.uSize.value.set(width, height)
 

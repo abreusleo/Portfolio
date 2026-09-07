@@ -55,7 +55,7 @@ Como o visitante fica sabendo que a sala é clicável.
 |---|---|---|
 | **Visita guiada** | A caminhada de primeira visita: 7 paradas, barra embaixo com SEGUIR e PULAR. Termina no mural. Uma vez por pessoa. | `Tour.js` · `#tour` |
 | **Convite do mural** | A frase que só aparece na última parada: "Não esqueça de deixar o seu recado!". | `#tour-invite` |
-| **Colchete** | A hachura que se deita na superfície do objeto sob o ponteiro, com o nome do lugar ao lado. Só no desktop — responde ao ponteiro, e celular não tem. Fica fora durante a abertura e a visita guiada. | `HoverFrame.js` · `#hotspot-frame` |
+| **Colchete** | A hachura que se deita na superfície do objeto sob o ponteiro, com o nome do lugar ao lado. Só no desktop — responde ao ponteiro, e celular não tem. Fica fora durante a abertura e a visita guiada. Todos os valores estão no `LOOK`, no topo do arquivo, e em sliders no `#debug`. | `HoverFrame.js` · `#hotspot-frame` |
 | **Luminárias de acento** | Dois spots de teto sobre a parede de quadros, um sobre a porta, e uma poça quente sobre os souvenirs do balcão. Luz de cena de verdade, não sobreposição. A TV e o quadro do Arsène ficam fora: os dois já fazem a própria luz, e somar outra apaga o que eles têm para mostrar. | `World/Lights.js` → `createAccents` |
 | **Ovos de páscoa** | Os objetos escondidos que se coleta clicando. O contador só aparece depois do primeiro. Nunca são desenhados nem listados. | `World/Eggs.js` · `#eggs` |
 
@@ -130,6 +130,7 @@ Coisas que ajudam a testar e a reproduzir um problema.
 | `?open=prints` | Abre um lugar direto. |
 | `?dpr=1` `?msaa=0` `?bloom=0` `?blur=0` `?fovcap=` | Fixam um parâmetro à mão e desligam a calibração. |
 | `?nosw` | Descadastra o service worker. |
+| `#debug` | Abre o painel de ajustes (lil-gui): cena, câmera, renderer, luzes e o colchete. Cobre o botão ENTRAR — clique nele antes de abrir o painel, ou entre e depois ponha o `#debug`. |
 
 **Memória do navegador** — `localStorage`, prefixo `basement.`
 
