@@ -34,6 +34,7 @@ export const strings = {
     modeSwitch: { pt: 'Imagem', en: 'Image' },
     online: { pt: 'na sala', en: 'in the room' },
     contact: { pt: 'Contato', en: 'Contact' },
+    language: { pt: 'Idioma', en: 'Language' },
 
     // Short forms, for the bar only. A row of names has to be scannable in one
     // pass, and "Projetos pessoais" beside six others is a paragraph. The

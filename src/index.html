@@ -84,6 +84,21 @@
             </p>
             <a class="bar-contact" href="https://www.linkedin.com/in/abreusleo/" target="_blank"
                rel="noopener" data-i18n="contact">Contato</a>
+
+            <!-- The language, closed to the one that is on. A flag is not a
+                 language, so each carries a written name for anything that
+                 reads rather than looks. -->
+            <div class="lang-picker" id="lang-picker">
+                <button id="lang-open" class="lang-current" type="button"
+                        aria-haspopup="true" aria-expanded="false"
+                        data-i18n-aria="language" aria-label="Idioma">
+                    <span data-flag="pt"><svg class="flag" viewBox="0 0 28 20" width="18" height="13" aria-hidden="true"><rect width="28" height="20" fill="#009b3a"/><path d="M14 2.4 25.4 10 14 17.6 2.6 10Z" fill="#ffdf00"/><circle cx="14" cy="10" r="4.1" fill="#002776"/></svg></span><span data-flag="en" hidden><svg class="flag" viewBox="0 0 28 20" width="18" height="13" aria-hidden="true"><rect width="28" height="20" fill="#f4f4f4"/><g fill="#b22234"><rect width="28" height="1.54"/><rect y="3.08" width="28" height="1.54"/><rect y="6.15" width="28" height="1.54"/><rect y="9.23" width="28" height="1.54"/><rect y="12.31" width="28" height="1.54"/><rect y="15.38" width="28" height="1.54"/><rect y="18.46" width="28" height="1.54"/></g><rect width="11.2" height="10.77" fill="#3c3b6e"/></svg></span>
+                </button>
+                <div id="lang-menu" class="lang-menu lang-toggle" hidden>
+                    <button type="button" data-lang="pt" aria-label="Português"><svg class="flag" viewBox="0 0 28 20" width="18" height="13" aria-hidden="true"><rect width="28" height="20" fill="#009b3a"/><path d="M14 2.4 25.4 10 14 17.6 2.6 10Z" fill="#ffdf00"/><circle cx="14" cy="10" r="4.1" fill="#002776"/></svg></button>
+                    <button type="button" data-lang="en" aria-label="English"><svg class="flag" viewBox="0 0 28 20" width="18" height="13" aria-hidden="true"><rect width="28" height="20" fill="#f4f4f4"/><g fill="#b22234"><rect width="28" height="1.54"/><rect y="3.08" width="28" height="1.54"/><rect y="6.15" width="28" height="1.54"/><rect y="9.23" width="28" height="1.54"/><rect y="12.31" width="28" height="1.54"/><rect y="15.38" width="28" height="1.54"/><rect y="18.46" width="28" height="1.54"/></g><rect width="11.2" height="10.77" fill="#3c3b6e"/></svg></button>
+                </div>
+            </div>
             <!-- Appears only once the first one has been found -->
             <div id="eggs" class="eggs hidden" aria-live="polite">
                 <svg viewBox="0 0 24 30" width="15" height="19" aria-hidden="true">
@@ -103,9 +118,6 @@
         <div id="switches" class="switches">
             <div class="mode-toggle">
                 <span class="active">HUMAN</span><a href="./machine.html">MACHINE</a>
-            </div>
-            <div class="lang-toggle">
-                <button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button>
             </div>
         </div>
 

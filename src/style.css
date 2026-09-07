@@ -443,8 +443,12 @@ body.opening-running #view-next
     display: flex;
     align-items: center;
     gap: 1.1rem;
-    padding-top: 0.95rem;
-    padding-bottom: 0.95rem;
+    /* The strip's own height, so everything on it sits on one centre line.
+       Matching a padding to that height instead leaves the two a pixel or so
+       apart, and drifts the moment either changes. */
+    height: 2.9rem;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 .hud-tl { left: 0; }
@@ -531,6 +535,58 @@ body:not(.mobile) #hud > .hud-tr { gap: 1.15rem; }
     opacity: 0.62;
 }
 
+/*
+ * The language, closed to the flag that is on.
+ *
+ * Two letters and a divider took a permanent slot in the bar for a choice
+ * almost nobody makes twice, so it closes.
+ */
+.lang-picker { position: relative; display: flex; align-items: center; }
+
+.lang-current,
+.lang-menu button
+{
+    display: flex;
+    padding: 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    pointer-events: auto;
+    line-height: 0;
+}
+
+.flag
+{
+    display: block;
+    border-radius: 1px;
+    opacity: 0.86;
+    outline: 1px solid rgba(233, 231, 227, 0.2);
+    outline-offset: -1px;
+    transition: opacity 0.18s ease;
+}
+
+.lang-current:hover .flag,
+.lang-menu button:hover .flag { opacity: 1; }
+
+.lang-current:focus-visible,
+.lang-menu button:focus-visible { outline: 1px solid var(--accent); outline-offset: 3px; }
+
+.lang-menu
+{
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(9, 10, 12, 0.94);
+    border: 1px solid rgba(233, 231, 227, 0.14);
+}
+
+.lang-menu[hidden] { display: none; }
+.lang-menu button.active .flag { opacity: 1; outline-color: var(--accent); }
+
 /* The one way out of the room that goes somewhere else. */
 .bar-contact
 {
@@ -558,7 +614,13 @@ body.mobile #hud > .hud-tr
 }
 
 body.mobile .menu-open { margin-top: 0.65rem; }
-body.mobile .online { justify-content: flex-end; }
+
+/* Stacked, the corner reads down its right edge; anything that does not reach
+   it hangs off the middle of the column. */
+body.mobile #hud > .hud-tr { text-align: right; }
+body.mobile .online,
+body.mobile .lang-picker,
+body.mobile .eggs { justify-content: flex-end; }
 
 /*
  * Which view, which language: the pair somebody sets once and then forgets.
@@ -577,24 +639,10 @@ body.mobile .online { justify-content: flex-end; }
     left: 50%;
     bottom: 1.4rem;
     transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    gap: 1.15rem;
-    padding: 0.5rem 1rem;
-    background: rgba(9, 10, 12, 0.72);
-    border: 1px solid rgba(233, 231, 227, 0.12);
     font-size: 0.68rem;
     letter-spacing: 0.14em;
     transition: opacity 0.3s ease, visibility 0s linear 0.3s;
 }
-
-.switches > * + *
-{
-    border-left: 1px solid rgba(233, 231, 227, 0.14);
-    padding-left: 1.15rem;
-}
-
-.switches .lang-toggle { margin-top: 0; }
 
 body.touring .switches,
 body.opening-running .switches
@@ -657,28 +705,46 @@ body.opening-running .switches
  * thing in the bar that is actually live, and these say it by being brighter
  * than the half that is not.
  */
+/*
+ * Which view: the room, or the same thing as plain text.
+ *
+ * A capsule with both halves on it and the one you are in lit. Both stay
+ * readable — the half you are not in is the offer, and an offer set in the
+ * dimmest colour on the page is not much of one.
+ */
 .mode-toggle
 {
-    display: flex;
-    align-items: baseline;
-    gap: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.34rem;
+    background: rgba(6, 7, 9, 0.92);
+    border: 1px solid rgba(233, 231, 227, 0.14);
+    border-radius: 999px;
+    pointer-events: auto;
+}
+
+.mode-toggle > *
+{
+    padding: 0.28rem 1.15rem;
+    border-radius: 999px;
 }
 
 .mode-toggle span.active
 {
-    color: var(--fg);
+    color: var(--accent);
 }
 
 .mode-toggle a
 {
-    color: var(--dim);
+    color: var(--fg);
     text-decoration: none;
-    transition: color 0.2s;
+    transition: color 0.2s, background 0.2s;
 }
 
 .mode-toggle a:hover
 {
     color: var(--fg);
+    background: rgba(233, 231, 227, 0.08);
 }
 
 #hint

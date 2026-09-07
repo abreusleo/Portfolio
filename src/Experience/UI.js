@@ -3,6 +3,7 @@ import { isMobile } from './Utils/device.js'
 import { isTyping } from './Utils/typing.js'
 import { quality } from './Utils/flags.js'
 import BarNav from './BarNav.js'
+import LangPicker from './LangPicker.js'
 import Menu from './Menu.js'
 import Opening from './Opening.js'
 import Presence from './Presence.js'
@@ -90,6 +91,7 @@ export default class UI
         // those when the world finishes, which is after all of this.
         this.menu = new Menu()
         this.barNav = new BarNav()
+        this.langPicker = new LangPicker()
         this.views = new Views()
         this.tour = new Tour()
         this.opening = new Opening()
@@ -346,6 +348,16 @@ export default class UI
         {
             const value = strings[node.dataset.i18n]
             if (value) node.textContent = t(value)
+        }
+
+        // Controls whose whole label is a picture — the flags, the close cross
+        // — say their name here instead. The attribute was already in the
+        // markup and had never been read, so the menu's cross was announcing
+        // its Portuguese name to an English reader.
+        for (const node of document.querySelectorAll('[data-i18n-aria]'))
+        {
+            const value = strings[node.dataset.i18nAria]
+            if (value) node.setAttribute('aria-label', t(value))
         }
 
         if (this.step && this.logEl && !this.logEl.dataset.i18n) this.logEl.textContent = t(this.step)
