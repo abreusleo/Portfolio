@@ -5,14 +5,18 @@ import Experience from '../Experience.js'
 import { quality } from '../Utils/flags.js'
 
 /**
- * A quiet ring on everything worth pressing.
+ * A soft light on everything worth pressing.
  *
  * Until now the only thing that said an object was pressable was the mouse
  * cursor, and a phone has no cursor: the room was mute about itself to every
- * visitor holding one. These are the answer, and they are deliberately almost
- * nothing — enough to notice when you are looking for somewhere to press, not
- * enough to read as decoration stuck to a room that is meant to look like a
- * room.
+ * visitor holding one. These are the answer, and they are made of
+ * the same thing the room is lit with rather than drawn on top of it: an
+ * additive glow bright enough to cross the composer's bloom threshold, so what
+ * reaches the screen is the scene's own bloom pass spreading it.
+ *
+ * A ring was the first attempt and it read as eight orange objects somebody
+ * had left lying about the room, which is what a mark drawn over a place does
+ * and what light falling on it does not.
  *
  * NOT on the hidden things. eggs.js is explicit that a plate is never drawn,
  * "not so much that the room hands out a map", and that stands: this is built
@@ -69,8 +73,14 @@ export default class Markers
             // Depth tested so a ring behind a wall stays behind it, and no
             // depth written so two rings never cut holes in each other.
             depthWrite: false,
+            // Additive: it adds light where it lands rather than covering
+            // what is under it. Nothing is hidden, only brightened.
+            blending: THREE.AdditiveBlending,
             uniforms: {
-                uColor: { value: new THREE.Color(this.theme.accent) },
+                // Warm, and over the bloom threshold on purpose — this is
+                // meant to read as a lamp catching the thing, not as a colour
+                // painted on it.
+                uColor: { value: new THREE.Color(this.theme.accent).lerp(new THREE.Color('#fff6ec'), 0.55).multiplyScalar(2.4) },
                 uOpacity: { value: 0 },
                 // In framebuffer pixels, so it has to be told the pixel
                 // ratio: the quality ladder moves that between 0.6 and 2,
@@ -90,7 +100,7 @@ export default class Markers
                     // object it belongs to — clamped at both ends, because a
                     // ring nobody can see is not a marker and one filling the
                     // frame is not discreet.
-                    float size = clamp(uSize * 6.0 / -mv.z, 7.0, 15.0);
+                    float size = clamp(uSize * 9.0 / -mv.z, 14.0, 44.0);
                     gl_PointSize = size * uScale;
                     gl_Position = projectionMatrix * mv;
                 }
@@ -100,13 +110,12 @@ export default class Markers
                 uniform float uOpacity;
                 void main()
                 {
-                    // A thin ring, not a donut: at the size this ends up on
-                    // screen a thick one reads as an orange object somebody
-                    // left in the room rather than as a mark on it.
+                    // A falloff, not an edge. An outline is a drawn thing; a
+                    // pool that fades to nothing is a light landing on one.
                     float d = length(gl_PointCoord - 0.5) * 2.0;
-                    float ring = smoothstep(0.60, 0.76, d) - smoothstep(0.92, 1.0, d);
-                    if (ring < 0.02) discard;
-                    gl_FragColor = vec4(uColor, ring * uOpacity);
+                    float glow = pow(max(0.0, 1.0 - d), 2.6);
+                    if (glow < 0.004) discard;
+                    gl_FragColor = vec4(uColor * glow * uOpacity, 1.0);
                 }
             `,
         })

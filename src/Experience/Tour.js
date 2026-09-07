@@ -21,19 +21,22 @@ import stations from './config/stations.js'
  */
 
 /**
- * The order, and it is not the order the room was built in.
+ * The order the room reads in, which is not the order it argues in.
  *
- * What he made comes first because it is the substance, then the two that live
- * outside the server, then the work that pays for the rest, then the person,
- * then the shelf of small things — and the quote last, because it is the one
- * stop that is not an argument and it closes better than anything else here.
+ * Measured rather than felt: projected onto the opening view, the shelves sit
+ * at -0.45 across the screen, the printed wall at 0.06, the machine at 0.32
+ * and the laptop at 0.46. Left to right, the way anybody reads a wall — so
+ * that is the walk, and the eye never jumps back across the room to keep up.
  *
- * The TV is deliberately absent. Every one of its six entries currently says
- * the demo is not published, and a first visit that culminates in a thing that
- * does not exist is worse than one stop shorter. It belongs back in this list
- * on the day there is a video.
+ * The quote is the exception, held to the end. It is the one stop that is not
+ * an argument, and it closes better than anything else here.
+ *
+ * The TV is absent. Every one of its six entries currently says the demo is
+ * not published, and a first visit that culminates in a thing that does not
+ * exist is worse than one stop shorter. It belongs back in this list on the
+ * day there is a video.
  */
-const STEPS = ['prints', 'products', 'work', 'about', 'pc', 'board']
+const STEPS = ['products', 'prints', 'about', 'pc', 'work', 'board']
 
 const STORAGE_KEY = 'basement.toured'
 
