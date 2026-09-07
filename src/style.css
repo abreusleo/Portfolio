@@ -455,7 +455,6 @@ body.opening-running #view-next
  * language — and set in one row at one weight they read as a single run-on
  * string. A hairline between them says there are three.
  */
-body:not(.mobile) #hud > .hud-tl > .menu-open,
 body:not(.mobile) #hud > .hud-tr > * + *
 {
     border-left: 1px solid rgba(233, 231, 227, 0.14);
@@ -464,7 +463,83 @@ body:not(.mobile) #hud > .hud-tr > * + *
 
 body:not(.mobile) #hud > .hud-tl,
 body:not(.mobile) #hud > .hud-tr { gap: 1.15rem; }
-body:not(.mobile) #hud .lang-toggle { margin-top: 0; }
+
+/*
+ * The places, across the middle of the bar.
+ *
+ * The strip was wide enough for a navigation and did not have one, which is
+ * what made it read as a bar with a hole in it. Now the seven places in the
+ * room are the navigation, and the button that used to open a list of them is
+ * gone from the desktop: two ways to the same seven destinations, a hand
+ * apart, is a choice nobody asked to make.
+ */
+.bar-nav
+{
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 1.35rem;
+    height: 2.9rem;
+    padding: 0 1rem;
+    white-space: nowrap;
+}
+
+/*
+ * The row and the button are the same navigation, and exactly one of them is
+ * on screen. The row needs about seven hundred pixels between the wordmark and
+ * the head count; under that the two collide, so the button comes back — on a
+ * phone, and on a desktop window too narrow to hold the names.
+ */
+.bar-nav { display: none; }
+
+@media (min-width: 1180px)
+{
+    body:not(.mobile) .bar-nav { display: flex; }
+    body:not(.mobile) .menu-open { display: none; }
+}
+
+.bar-link
+{
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--dim);
+    cursor: pointer;
+    pointer-events: auto;
+    transition: color 0.18s ease;
+}
+
+.bar-link:hover { color: var(--fg); }
+.bar-link:focus-visible { outline: 1px solid var(--accent); outline-offset: 4px; }
+
+/*
+ * How many things are behind a name, on the two names that hide more than one.
+ * A "(1)" after every single place would be noise dressed as information.
+ */
+.bar-link sup
+{
+    margin-left: 0.2em;
+    font-size: 0.78em;
+    vertical-align: super;
+    color: var(--dim);
+    opacity: 0.62;
+}
+
+/* The one way out of the room that goes somewhere else. */
+.bar-contact
+{
+    color: var(--fg);
+    text-decoration: none;
+    transition: color 0.18s ease;
+}
+
+.bar-contact:hover { color: var(--accent); }
 
 /*
  * A bar needs a width to be a bar. Three hundred and ninety pixels is not one:
@@ -483,7 +558,50 @@ body.mobile #hud > .hud-tr
 }
 
 body.mobile .menu-open { margin-top: 0.65rem; }
-body.mobile .online { justify-content: flex-end; margin-bottom: 0.35rem; }
+body.mobile .online { justify-content: flex-end; }
+
+/*
+ * Which view, which language: the pair somebody sets once and then forgets.
+ *
+ * Off the bar, because the bar is for the places and for what is happening
+ * right now, and a pair of preferences is neither. Bottom centre, where the
+ * room has floor rather than furniture at every framing the camera can reach.
+ *
+ * It stands down while the guided walk is running and while the way in is
+ * playing: both of those put their own bar in exactly this spot, and two rows
+ * of chrome in one corner is one more than anybody reads.
+ */
+.switches
+{
+    position: absolute;
+    left: 50%;
+    bottom: 1.4rem;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 1.15rem;
+    padding: 0.5rem 1rem;
+    background: rgba(9, 10, 12, 0.72);
+    border: 1px solid rgba(233, 231, 227, 0.12);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+}
+
+.switches > * + *
+{
+    border-left: 1px solid rgba(233, 231, 227, 0.14);
+    padding-left: 1.15rem;
+}
+
+.switches .lang-toggle { margin-top: 0; }
+
+body.touring .switches,
+body.opening-running .switches
+{
+    opacity: 0;
+    visibility: hidden;
+}
 
 /*
  * The head count, which is the one thing on screen that is only true now.
@@ -1850,18 +1968,7 @@ body.mobile #hotspot-frame { display: none; }
 }
 .menu-open:hover { border-color: var(--accent); color: var(--accent); }
 
-/*
- * On the bar it loses the box. It was the only bordered object in a strip made
- * of bare type, which made the least important thing in it the heaviest.
- */
-body:not(.mobile) .menu-open
-{
-    padding: 0;
-    background: none;
-    border: 0;
-}
 
-body:not(.mobile) .menu-open:hover { color: var(--accent); }
 
 .menu-bars { display: flex; flex-direction: column; gap: 3px; width: 13px; }
 .menu-bars i { display: block; height: 1.5px; background: currentColor; }

@@ -67,22 +67,23 @@
 
         <div class="hud-tl">
             <span class="wordmark">LEONARDO</span><span class="tag">/ portfolio</span>
+            <!-- Shown wherever the row of names in the bar is not -->
             <button id="menu-open" class="menu-open" type="button" aria-expanded="false" aria-controls="menu">
                 <span class="menu-bars" aria-hidden="true"><i></i><i></i><i></i></span>
                 <span data-i18n="menuOpen">IR PARA</span>
             </button>
         </div>
+
+        <!-- The places, filled in from the hotspots the scene registered -->
+        <nav id="bar-nav" class="bar-nav" aria-label="Lugares da sala"></nav>
+
         <div class="hud-tr">
             <p id="online" class="online hidden">
                 <span class="online-dot" aria-hidden="true"></span><span
                     id="online-count">0</span> <span id="online-label">na sala</span>
             </p>
-            <div class="mode-toggle">
-                <span class="active">HUMAN</span><a href="./machine.html">MACHINE</a>
-            </div>
-            <div class="lang-toggle">
-                <button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button>
-            </div>
+            <a class="bar-contact" href="https://www.linkedin.com/in/abreusleo/" target="_blank"
+               rel="noopener" data-i18n="contact">Contato</a>
             <!-- Appears only once the first one has been found -->
             <div id="eggs" class="eggs hidden" aria-live="polite">
                 <svg viewBox="0 0 24 30" width="15" height="19" aria-hidden="true">
@@ -97,6 +98,17 @@
              has the whole scene and a keyboard has F. -->
         <button id="view-prev" class="view-arrow view-prev" type="button" data-mobile aria-label="Girar para a porta">&lsaquo;</button>
         <button id="view-next" class="view-arrow view-next" type="button" data-mobile aria-label="Girar para a TV">&rsaquo;</button>
+        <!-- Which view, which language. Away from the bar and out of the
+             room's way, the pair a visitor changes once and then forgets. -->
+        <div id="switches" class="switches">
+            <div class="mode-toggle">
+                <span class="active">HUMAN</span><a href="./machine.html">MACHINE</a>
+            </div>
+            <div class="lang-toggle">
+                <button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button>
+            </div>
+        </div>
+
         <div class="hud-bl">
             <span id="hint" data-desktop>F explorar · ESC voltar</span>
         </div>

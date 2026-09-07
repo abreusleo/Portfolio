@@ -19,6 +19,22 @@
         .toggle .sep { color: var(--dim); margin: 0 0.5rem; }
         .dim { color: var(--dim); }
         a { color: var(--fg); }
+
+        /*
+         * The page prints itself on arrival, a line at a time.
+         *
+         * Hidden by the script and not by this stylesheet, so a reader without
+         * JavaScript — which includes a fair share of the crawlers and agents
+         * this page exists for — gets the whole document immediately. What is
+         * in the source is always the complete text; the reveal is decoration
+         * laid on top of it afterwards.
+         */
+        body.typing .ln { opacity: 0; }
+        body.typing .ln.on { opacity: 1; }
+
+        @media (prefers-reduced-motion: reduce) {
+            body.typing .ln { opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -259,5 +275,57 @@ human view .... <a href="/">/</a>
 llms.txt ...... <a href="./llms.txt">/llms.txt</a>
 human view .... <a href="./">/</a>
 </pre>
+
+<script>
+/*
+ * Reveals the page a line at a time, quickly.
+ *
+ * By line and not by character: these blocks carry markup — links, dimmed
+ * spans — and revealing raw HTML one character at a time shows half-written
+ * tags. Every line here is whole, so wrapping each one is safe and the effect
+ * is the same at this speed.
+ *
+ * The budget is fixed rather than the step: a page that grows by fifty lines
+ * should not take longer to arrive, so the step shrinks to fit instead.
+ */
+(function () {
+    var quiet = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (quiet) return;
+
+    var blocks = document.querySelectorAll('pre');
+    var lines = [];
+
+    for (var i = 0; i < blocks.length; i++) {
+        var parts = blocks[i].innerHTML.split('\n');
+        blocks[i].innerHTML = parts.map(function (line) {
+            return '<span class="ln">' + line + '</span>';
+        }).join('\n');
+        lines = lines.concat([].slice.call(blocks[i].querySelectorAll('.ln')));
+    }
+
+    document.body.className += ' typing';
+
+    var BUDGET = 1500;
+    var step = Math.max(3, Math.min(11, BUDGET / lines.length));
+    var at = 0;
+    var last = 0;
+
+    function tick(now) {
+        if (now - last >= step) {
+            // Catches up rather than falling behind when a frame is late, so a
+            // slow machine gets the same one and a half seconds.
+            var due = Math.max(1, Math.round((now - last) / step));
+            for (var n = 0; n < due && at < lines.length; n++) {
+                lines[at++].className = 'ln on';
+            }
+            last = now;
+        }
+        if (at < lines.length) requestAnimationFrame(tick);
+        else document.body.className = document.body.className.replace(' typing', '');
+    }
+
+    requestAnimationFrame(function (now) { last = now; tick(now); });
+})();
+</script>
 </body>
 </html>

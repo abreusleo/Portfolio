@@ -113,6 +113,10 @@ export default class Tour
 
         this.root.classList.remove('hidden')
         this.root.setAttribute('aria-hidden', 'false')
+
+        // The walk's own bar sits where the switches do. Two rows of chrome
+        // stacked in the same corner is one more than anybody reads.
+        document.body.classList.add('touring')
     }
 
     draw(hotspot = this.experience.interactions?.find(STEPS[this.at]))
@@ -151,6 +155,7 @@ export default class Tour
         if (!this.running) return
 
         this.running = false
+        document.body.classList.remove('touring')
         if (home) this.camera.goTo(stations.overview, 1.4, 'power2.inOut')
         this.root.classList.add('hidden')
         this.root.setAttribute('aria-hidden', 'true')

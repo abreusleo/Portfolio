@@ -24,10 +24,10 @@ import { isMobile } from './Utils/device.js'
  * end — a new hotspot in an odd position is a smaller failure than one that
  * never shows up at all.
  */
-const ORDER = ['prints', 'products', 'tv', 'pc', 'work', 'about', 'notes']
+export const ORDER = ['prints', 'products', 'tv', 'pc', 'work', 'about', 'notes']
 
 /** Atmosphere rather than portfolio: found by looking, not by being listed. */
-const OMIT = new Set(['board'])
+export const OMIT = new Set(['board'])
 
 export default class Menu
 {

@@ -2,6 +2,7 @@ import Experience from './Experience.js'
 import { isMobile } from './Utils/device.js'
 import { isTyping } from './Utils/typing.js'
 import { quality } from './Utils/flags.js'
+import BarNav from './BarNav.js'
 import Menu from './Menu.js'
 import Opening from './Opening.js'
 import Presence from './Presence.js'
@@ -88,6 +89,7 @@ export default class UI
         // Built last: it reads the hotspots, and Interactions registers
         // those when the world finishes, which is after all of this.
         this.menu = new Menu()
+        this.barNav = new BarNav()
         this.views = new Views()
         this.tour = new Tour()
         this.opening = new Opening()

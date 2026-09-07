@@ -33,6 +33,19 @@ export const strings = {
     modeQualityHint: { pt: 'mais bonita', en: 'better looking' },
     modeSwitch: { pt: 'Imagem', en: 'Image' },
     online: { pt: 'na sala', en: 'in the room' },
+    contact: { pt: 'Contato', en: 'Contact' },
+
+    // Short forms, for the bar only. A row of names has to be scannable in one
+    // pass, and "Projetos pessoais" beside six others is a paragraph. The
+    // panels keep the full titles, which is where the room says what a place
+    // actually is.
+    navPrints: { pt: 'Projetos', en: 'Projects' },
+    navProducts: { pt: 'Produtos', en: 'Products' },
+    navTv: { pt: 'Demo', en: 'Demo' },
+    navPc: { pt: 'PC', en: 'PC' },
+    navWork: { pt: 'Trabalho', en: 'Work' },
+    navAbout: { pt: 'Sobre', en: 'About' },
+    navNotes: { pt: 'Recados', en: 'Notes' },
 
     openingLine: {
         pt: 'Uma sala com o que eu construí dentro.',
