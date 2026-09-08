@@ -3,6 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--
+      Content-Security-Policy. The room is a static Vite bundle on GitHub Pages,
+      which cannot send HTTP headers, so the policy rides in a meta tag instead.
+      Everything is same-origin except: Google Fonts (style + font hosts) and the
+      message wall at msg.leo-abreu.com (connect-src). 'wasm-unsafe-eval' and the
+      blob worker sources are required by the Draco and KTX2 decoders three.js
+      spins up — without them the models never load. frame-ancestors is omitted on
+      purpose: a meta-delivered policy ignores it (and Pages cannot set the header),
+      so clickjacking of this showcase page stays an accepted, low risk.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://msg.leo-abreu.com; worker-src 'self' blob:; child-src 'self' blob:; base-uri 'none'; object-src 'none'; form-action 'self'">
     <title>Léo Abreu</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml">
     <link rel="icon" href="./favicon.png" sizes="32x32" type="image/png">
